@@ -1,7 +1,7 @@
 /** creates an element and assigns props to it */
-export function createElement(
+export function createElement<T extends keyof HTMLElementTagNameMap>(
   document: Document,
-  tagName: string,
+  tagName: T,
   {
     style,
     ...props
