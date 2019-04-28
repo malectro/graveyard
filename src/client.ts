@@ -5,6 +5,21 @@
 
 import {scale, repeat} from './utils/array.js';
 
+interface Point {
+  x: number;
+  y: number;
+}
+
+  interface Headstone extends Point {
+    id: string;
+    text: string;
+  }
+
+  interface Hero extends Point {
+    id: string,
+    name: string,
+  }
+
 async function main() {
   const app = new PIXI.Application({
     width: window.innerWidth,
@@ -18,7 +33,6 @@ async function main() {
 
   const headstoneGeometry = new PIXI.Geometry()
     .addAttribute('aVertexPosition', scale(unitSquare, 100), 2)
-    .addAttribute('aColor', repeat([0.8, 0.5, 0.5], 4), 3)
     .addIndex([0, 1, 2, 0, 3, 2]);
 
   const [vert, frag] = await Promise.all([
@@ -26,18 +40,14 @@ async function main() {
     fetch('shaders/solidColor.frag').then(response => response.text()),
   ]);
 
-  const shader = PIXI.Shader.from(vert, frag);
+  const solidColorProgram = PIXI.Program.from(vert, frag);
+  const greenShader = new PIXI.Shader(solidColorProgram, {
+    uColor: [0.5, 0.8, 0.5],
+  });
 
   const world = new PIXI.Container();
 
   app.stage.addChild(world);
-
-  interface Headstone {
-    id: string;
-    x: number;
-    y: number;
-    text: string;
-  }
 
   const stones: Headstone[] = [
     {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
@@ -46,11 +56,22 @@ async function main() {
   ];
 
   const headstoneMeshes = stones.map(stone => {
-  const headstoneMesh = new PIXI.Mesh(headstoneGeometry, shader);
-  headstoneMesh.position.set(stone.x, stone.y);
-  world.addChild(headstoneMesh);
-  return headstoneMesh;
+    const headstoneMesh = new PIXI.Mesh(headstoneGeometry, greenShader);
+    headstoneMesh.position.set(stone.x, stone.y);
+    world.addChild(headstoneMesh);
+    return headstoneMesh;
   });
+
+  const hero: Hero = {
+    id: '1',
+    name: 'Kyle',
+    x: 0,
+    y: 0,
+  };
+
+  const heroMesh = new PIXI.Mesh(headstoneGeometry, greenShader);
+  heroMesh.position.set(hero.x, hero.y);
+  app.stage.addChild(heroMesh);
 }
 
 main();
