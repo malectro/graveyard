@@ -4,21 +4,17 @@
 //import * as PIXI from 'pixi.js';
 
 import {scale, repeat} from './utils/array.js';
+import * as PointMath from './utils/point.js';
 
-interface Point {
-  x: number;
-  y: number;
+interface Headstone extends PointMath.Point {
+  id: string;
+  text: string;
 }
 
-  interface Headstone extends Point {
-    id: string;
-    text: string;
-  }
-
-  interface Hero extends Point {
-    id: string,
-    name: string,
-  }
+interface Hero extends PointMath.Point {
+  id: string;
+  name: string;
+}
 
 async function main() {
   const app = new PIXI.Application({
@@ -29,10 +25,10 @@ async function main() {
   });
   document.body.appendChild(app.view);
 
-  const unitSquare = [0, 0, 1, 0, 1, 1, 0, 1];
+  const unitSquare = [-1, -1, 1, -1, 1, 1, -1, 1];
 
   const headstoneGeometry = new PIXI.Geometry()
-    .addAttribute('aVertexPosition', scale(unitSquare, 100), 2)
+    .addAttribute('aVertexPosition', scale(unitSquare, 50), 2)
     .addIndex([0, 1, 2, 0, 3, 2]);
 
   const [vert, frag] = await Promise.all([
@@ -41,13 +37,12 @@ async function main() {
   ]);
 
   const solidColorProgram = PIXI.Program.from(vert, frag);
-  const greenShader = new PIXI.Shader(solidColorProgram, {
-    uColor: [0.5, 0.8, 0.5],
-  });
 
   const world = new PIXI.Container();
 
   app.stage.addChild(world);
+  app.stage.x += Math.floor(window.innerWidth / 2);
+  app.stage.y += Math.floor(window.innerHeight / 2);
 
   const stones: Headstone[] = [
     {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
@@ -55,6 +50,9 @@ async function main() {
     {id: '3', x: 300, y: 150, text: 'Here lies Kyle'},
   ];
 
+  const greenShader = new PIXI.Shader(solidColorProgram, {
+    uColor: [0.5, 0.8, 0.5],
+  });
   const headstoneMeshes = stones.map(stone => {
     const headstoneMesh = new PIXI.Mesh(headstoneGeometry, greenShader);
     headstoneMesh.position.set(stone.x, stone.y);
@@ -69,9 +67,74 @@ async function main() {
     y: 0,
   };
 
-  const heroMesh = new PIXI.Mesh(headstoneGeometry, greenShader);
+  const pinkShader = new PIXI.Shader(solidColorProgram, {
+    uColor: [0.8, 0.5, 0.5],
+  });
+  const heroMesh = new PIXI.Mesh(headstoneGeometry, pinkShader);
   heroMesh.position.set(hero.x, hero.y);
   app.stage.addChild(heroMesh);
+
+  app.ticker.add(_delta => {
+    PointMath.add(hero, velocity);
+    heroMesh.position.set(hero.x, hero.y);
+  });
+
+  const keys = {
+    ArrowDown: {x: 0, y: 1},
+    ArrowUp: {x: 0, y: -1},
+    ArrowRight: {x: 1, y: 0},
+    ArrowLeft: {x: -1, y: 0},
+  };
+  const direction = {x: 0, y: 0};
+  const speed = 10;
+  const velocity = {x: 0, y: 0};
+
+  function resolveVelocity() {
+    PointMath.scale(
+      PointMath.normalize(PointMath.set(velocity, direction)),
+      speed,
+    );
+    console.log('velocity', velocity);
+  }
+
+  const currentKeys = new Set();
+
+  window.addEventListener(
+    'keydown',
+    (event: KeyboardEvent) => {
+      const key = keys[event.key];
+
+      if (key) {
+        event.preventDefault();
+
+        if (!currentKeys.has(event.key)) {
+          currentKeys.add(event.key);
+
+          PointMath.add(direction, key);
+          resolveVelocity();
+        }
+      }
+    },
+    {capture: true},
+  );
+
+  window.addEventListener(
+    'keyup',
+    event => {
+      const key = keys[event.key];
+
+      if (key) {
+        event.preventDefault();
+
+        if (currentKeys.has(event.key)) {
+          currentKeys.delete(event.key);
+          PointMath.subtract(direction, key);
+          resolveVelocity();
+        }
+      }
+    },
+    {capture: true},
+  );
 }
 
 main();
