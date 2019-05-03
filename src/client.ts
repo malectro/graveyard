@@ -17,6 +17,8 @@ interface Hero extends PointMath.Point {
 }
 
 async function main() {
+  const halfWindowWidth = window.innerWidth / 2;
+
   const app = new PIXI.Application({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -41,7 +43,7 @@ async function main() {
   const world = new PIXI.Container();
 
   app.stage.addChild(world);
-  app.stage.x += Math.floor(window.innerWidth / 2);
+  app.stage.x += Math.floor(halfWindowWidth);
   app.stage.y += Math.floor(window.innerHeight / 2);
 
   const stones: Headstone[] = [
@@ -77,6 +79,13 @@ async function main() {
   app.ticker.add(_delta => {
     PointMath.add(hero, velocity);
     heroMesh.position.set(hero.x, hero.y);
+
+    const stageDistance = hero.x + (app.stage.x - halfWindowWidth);
+    if (stageDistance > halfWindowWidth) {
+      app.stage.x -= stageDistance - halfWindowWidth; 
+    } else if (stageDistance < -halfWindowWidth) {
+      app.stage.x -= stageDistance + halfWindowWidth;
+    }
   });
 
   const keys = {
@@ -94,7 +103,6 @@ async function main() {
       PointMath.normalize(PointMath.set(velocity, direction)),
       speed,
     );
-    console.log('velocity', velocity);
   }
 
   const currentKeys = new Set();
@@ -130,6 +138,7 @@ async function main() {
           currentKeys.delete(event.key);
           PointMath.subtract(direction, key);
           resolveVelocity();
+          console.log('hio', hero.x, app.stage.x - halfWindowWidth, hero.x + (app.stage.x - halfWindowWidth), window.innerWidth);
         }
       }
     },
