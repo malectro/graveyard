@@ -42,3 +42,16 @@ export function normalize(point: Point) {
 
   return point;
 }
+
+export function floor(point: Point) {
+  point.x = Math.floor(point.x);
+  point.y = Math.floor(point.y);
+  return point;
+}
+
+export function assignMin(point: Point) {
+  const min = Math.min(point.x, point.y);
+  point.x = min;
+  point.y = min;
+  return point;
+}

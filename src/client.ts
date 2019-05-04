@@ -17,11 +17,21 @@ interface Hero extends PointMath.Point {
 }
 
 async function main() {
-  const halfWindowWidth = window.innerWidth / 2;
+  const viewSize = PointMath.point(window.innerWidth, window.innerHeight);
+  const halfViewSize = PointMath.floor(PointMath.scale({...viewSize}, 0.5));
+
+  const cameraPaddingPercentage = 0.2;
+  const cameraPadding = PointMath.assignMin(
+    PointMath.floor(PointMath.scale({...viewSize}, cameraPaddingPercentage)),
+  );
+  const cameraMaxDistance = PointMath.subtract(
+    {...halfViewSize},
+    cameraPadding,
+  );
 
   const app = new PIXI.Application({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: viewSize.x,
+    height: viewSize.y,
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
   });
@@ -43,8 +53,17 @@ async function main() {
   const world = new PIXI.Container();
 
   app.stage.addChild(world);
-  app.stage.x += Math.floor(halfWindowWidth);
-  app.stage.y += Math.floor(window.innerHeight / 2);
+
+  function setCameraX(x: number) {
+    app.stage.x = halfViewSize.x - x;
+  }
+  function setCameraY(y: number) {
+    app.stage.y = halfViewSize.y - y;
+  }
+function setCameraPosition(x: number, y: number) {
+  app.stage.x = halfViewSize.x - x;
+  app.stage.y = halfViewSize.y - y;
+}
 
   const stones: Headstone[] = [
     {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
@@ -76,15 +95,27 @@ async function main() {
   heroMesh.position.set(hero.x, hero.y);
   app.stage.addChild(heroMesh);
 
+  setCameraPosition(hero.x, hero.y);
+
   app.ticker.add(_delta => {
     PointMath.add(hero, velocity);
     heroMesh.position.set(hero.x, hero.y);
 
-    const stageDistance = hero.x + (app.stage.x - halfWindowWidth);
-    if (stageDistance > halfWindowWidth) {
-      app.stage.x -= stageDistance - halfWindowWidth; 
-    } else if (stageDistance < -halfWindowWidth) {
-      app.stage.x -= stageDistance + halfWindowWidth;
+    const cameraX = halfViewSize.x - app.stage.x;
+    const cameraY = halfViewSize.y - app.stage.y;
+
+    const cameraDistanceX = hero.x - cameraX;
+    if (cameraDistanceX > cameraMaxDistance.x) {
+      setCameraX(hero.x - cameraMaxDistance.x);
+    } else if (cameraDistanceX < -cameraMaxDistance.x) {
+      setCameraX(hero.x + cameraMaxDistance.x);
+    }
+
+    const cameraDistanceY = hero.y - cameraY;
+    if (cameraDistanceY > cameraMaxDistance.y) {
+      setCameraY(hero.y - cameraMaxDistance.y);
+    } else if (cameraDistanceY < -cameraMaxDistance.y) {
+      setCameraY(hero.y + cameraMaxDistance.y);
     }
   });
 
@@ -138,7 +169,13 @@ async function main() {
           currentKeys.delete(event.key);
           PointMath.subtract(direction, key);
           resolveVelocity();
-          console.log('hio', hero.x, app.stage.x - halfWindowWidth, hero.x + (app.stage.x - halfWindowWidth), window.innerWidth);
+          console.log(
+            'hio',
+            hero.x,
+            app.stage.x - halfWindowWidth,
+            hero.x + (app.stage.x - halfWindowWidth),
+            viewSize.x,
+          );
         }
       }
     },
@@ -147,6 +184,9 @@ async function main() {
 }
 
 main();
+
+/*
+*/
 
 /*
 window.addEventListener('resize', () => {
