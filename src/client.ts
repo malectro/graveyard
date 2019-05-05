@@ -6,36 +6,27 @@
 import {scale, repeat} from './utils/array.js';
 import * as PointMath from './utils/point.js';
 
+import * as Hero from './hero.js';
+import View from './view.js';
+import './controls.js';
+
 interface Headstone extends PointMath.Point {
   id: string;
   text: string;
 }
 
-interface Hero extends PointMath.Point {
-  id: string;
-  name: string;
-}
+const hero = Hero.hero;
 
 async function main() {
-  const viewSize = PointMath.point(window.innerWidth, window.innerHeight);
-  const halfViewSize = PointMath.floor(PointMath.scale({...viewSize}, 0.5));
-
-  const cameraPaddingPercentage = 0.2;
-  const cameraPadding = PointMath.assignMin(
-    PointMath.floor(PointMath.scale({...viewSize}, cameraPaddingPercentage)),
-  );
-  const cameraMaxDistance = PointMath.subtract(
-    {...halfViewSize},
-    cameraPadding,
-  );
-
   const app = new PIXI.Application({
-    width: viewSize.x,
-    height: viewSize.y,
+    width: window.innerWidth,
+    height: window.innerHeight,
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
   });
   document.body.appendChild(app.view);
+
+  const view = new View(app, {cameraPaddingPercentage: 0.2});
 
   const unitSquare = [-1, -1, 1, -1, 1, 1, -1, 1];
 
@@ -54,17 +45,6 @@ async function main() {
 
   app.stage.addChild(world);
 
-  function setCameraX(x: number) {
-    app.stage.x = halfViewSize.x - x;
-  }
-  function setCameraY(y: number) {
-    app.stage.y = halfViewSize.y - y;
-  }
-function setCameraPosition(x: number, y: number) {
-  app.stage.x = halfViewSize.x - x;
-  app.stage.y = halfViewSize.y - y;
-}
-
   const stones: Headstone[] = [
     {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
     {id: '2', x: 50, y: 100, text: 'Here lies Kyle'},
@@ -81,13 +61,6 @@ function setCameraPosition(x: number, y: number) {
     return headstoneMesh;
   });
 
-  const hero: Hero = {
-    id: '1',
-    name: 'Kyle',
-    x: 0,
-    y: 0,
-  };
-
   const pinkShader = new PIXI.Shader(solidColorProgram, {
     uColor: [0.8, 0.5, 0.5],
   });
@@ -95,92 +68,14 @@ function setCameraPosition(x: number, y: number) {
   heroMesh.position.set(hero.x, hero.y);
   app.stage.addChild(heroMesh);
 
-  setCameraPosition(hero.x, hero.y);
+  view.setCameraPosition(hero);
 
   app.ticker.add(_delta => {
-    PointMath.add(hero, velocity);
+    // TODO (kyle): only do any of this if the hero is moving
+    PointMath.add(hero, hero.velocity);
     heroMesh.position.set(hero.x, hero.y);
-
-    const cameraX = halfViewSize.x - app.stage.x;
-    const cameraY = halfViewSize.y - app.stage.y;
-
-    const cameraDistanceX = hero.x - cameraX;
-    if (cameraDistanceX > cameraMaxDistance.x) {
-      setCameraX(hero.x - cameraMaxDistance.x);
-    } else if (cameraDistanceX < -cameraMaxDistance.x) {
-      setCameraX(hero.x + cameraMaxDistance.x);
-    }
-
-    const cameraDistanceY = hero.y - cameraY;
-    if (cameraDistanceY > cameraMaxDistance.y) {
-      setCameraY(hero.y - cameraMaxDistance.y);
-    } else if (cameraDistanceY < -cameraMaxDistance.y) {
-      setCameraY(hero.y + cameraMaxDistance.y);
-    }
+    view.focusCamera(hero);
   });
-
-  const keys = {
-    ArrowDown: {x: 0, y: 1},
-    ArrowUp: {x: 0, y: -1},
-    ArrowRight: {x: 1, y: 0},
-    ArrowLeft: {x: -1, y: 0},
-  };
-  const direction = {x: 0, y: 0};
-  const speed = 10;
-  const velocity = {x: 0, y: 0};
-
-  function resolveVelocity() {
-    PointMath.scale(
-      PointMath.normalize(PointMath.set(velocity, direction)),
-      speed,
-    );
-  }
-
-  const currentKeys = new Set();
-
-  window.addEventListener(
-    'keydown',
-    (event: KeyboardEvent) => {
-      const key = keys[event.key];
-
-      if (key) {
-        event.preventDefault();
-
-        if (!currentKeys.has(event.key)) {
-          currentKeys.add(event.key);
-
-          PointMath.add(direction, key);
-          resolveVelocity();
-        }
-      }
-    },
-    {capture: true},
-  );
-
-  window.addEventListener(
-    'keyup',
-    event => {
-      const key = keys[event.key];
-
-      if (key) {
-        event.preventDefault();
-
-        if (currentKeys.has(event.key)) {
-          currentKeys.delete(event.key);
-          PointMath.subtract(direction, key);
-          resolveVelocity();
-          console.log(
-            'hio',
-            hero.x,
-            app.stage.x - halfWindowWidth,
-            hero.x + (app.stage.x - halfWindowWidth),
-            viewSize.x,
-          );
-        }
-      }
-    },
-    {capture: true},
-  );
 }
 
 main();
