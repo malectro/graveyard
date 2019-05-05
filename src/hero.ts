@@ -1,6 +1,6 @@
 import * as p from './utils/point.js';
 
-interface Hero extends p.Point {
+export interface HeroType extends p.Point {
   id: string;
   name: string;
   speed: number;
@@ -8,7 +8,7 @@ interface Hero extends p.Point {
   velocity: p.Point;
 }
 
-export function create(): Hero {
+export function create(): HeroType {
   return {
     id: '1',
     name: 'Kyle',
@@ -20,7 +20,7 @@ export function create(): Hero {
   };
 }
 
-export function resolveVelocity(hero: Hero) {
+export function resolveVelocity(hero: HeroType) {
   p.scale(p.normalize(p.set(hero.velocity, hero.direction)), hero.speed);
   return hero;
 }

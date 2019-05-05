@@ -2,8 +2,7 @@ import * as PointMath from './utils/point.js';
 
 import * as Hero from './hero.js';
 
-const {hero} = Hero;
-
+export function init(hero: Hero.HeroType) {
   const keys = {
     ArrowDown: {x: 0, y: 1},
     ArrowUp: {x: 0, y: -1},
@@ -49,3 +48,4 @@ const {hero} = Hero;
     },
     {capture: true},
   );
+}

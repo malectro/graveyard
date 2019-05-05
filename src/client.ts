@@ -9,7 +9,7 @@ import * as p from './utils/point.js';
 import * as Hero from './hero.js';
 import * as Headstone from './headstone.js';
 import View from './view.js';
-import './controls.js';
+import * as Controls from './controls.js';
 
 
 const hero = Hero.create();
@@ -73,6 +73,8 @@ async function main() {
     heroMesh.position.set(hero.x, hero.y);
     view.focusCamera(hero);
   });
+
+  Controls.init(hero);
 }
 
 main();
