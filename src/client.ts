@@ -4,18 +4,15 @@
 //import * as PIXI from 'pixi.js';
 
 import {scale, repeat} from './utils/array.js';
-import * as PointMath from './utils/point.js';
+import * as p from './utils/point.js';
 
 import * as Hero from './hero.js';
+import * as Headstone from './headstone.js';
 import View from './view.js';
 import './controls.js';
 
-interface Headstone extends PointMath.Point {
-  id: string;
-  text: string;
-}
 
-const hero = Hero.hero;
+const hero = Hero.create();
 
 async function main() {
   const app = new PIXI.Application({
@@ -45,7 +42,7 @@ async function main() {
 
   app.stage.addChild(world);
 
-  const stones: Headstone[] = [
+  const stones: Headstone.Type[] = [
     {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
     {id: '2', x: 50, y: 100, text: 'Here lies Kyle'},
     {id: '3', x: 300, y: 150, text: 'Here lies Kyle'},
@@ -72,7 +69,7 @@ async function main() {
 
   app.ticker.add(_delta => {
     // TODO (kyle): only do any of this if the hero is moving
-    PointMath.add(hero, hero.velocity);
+    p.add(hero, hero.velocity);
     heroMesh.position.set(hero.x, hero.y);
     view.focusCamera(hero);
   });
