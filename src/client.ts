@@ -2,6 +2,7 @@
 //import * as PIXI from 'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.8.7/pixi.min.js';
 //import * as PIXI from '../node_modules/pixi.js/dist/pixi.js';
 //import * as PIXI from 'pixi.js';
+//import {Observable} from 'https://raw.githubusercontent.com/ReactiveX/rxjs/master/src/index.ts';
 
 import {scale, repeat} from './utils/array.js';
 import * as p from './utils/point.js';
@@ -10,6 +11,7 @@ import * as Hero from './hero.js';
 import * as Headstone from './headstone.js';
 import View from './view.js';
 import * as Controls from './controls.js';
+import * as ws from './websocket.js';
 
 
 const hero = Hero.create();
@@ -75,6 +77,8 @@ async function main() {
   });
 
   Controls.init(hero);
+
+  ws.start('');
 }
 
 main();

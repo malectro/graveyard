@@ -1,7 +1,9 @@
 import * as PointMath from './utils/point.js';
 
+type PixiApp = any;
+
 export default class View {
-  app: PIXI.Application;
+  app: PixiApp;
   readonly size: PointMath.Point;
   readonly halfSize: PointMath.Point;
   readonly camera: {
@@ -10,7 +12,7 @@ export default class View {
   };
 
   constructor(
-    app: PIXI.Application,
+    app: PixiApp,
     {
       cameraPaddingPercentage,
     }: {

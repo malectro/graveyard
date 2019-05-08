@@ -5,7 +5,7 @@ export interface Type extends p.Point {
   text: string;
 }
 
-export function create(props: Partial<Headstone>): Headstone {
+export function create(props: Partial<Type>): Type {
   return {
     id: 'bad',
     text: 'some text',
