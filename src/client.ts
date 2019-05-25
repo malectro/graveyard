@@ -15,6 +15,10 @@ import * as ws from './websocket.js';
 
 
 const hero = Hero.create();
+const data = {
+  hero,
+  headstones: [],
+};
 
 async function main() {
   const app = new PIXI.Application({
@@ -78,7 +82,7 @@ async function main() {
 
   Controls.init(hero);
 
-  ws.start('');
+  ws.start('localhost:8030', data);
 }
 
 main();

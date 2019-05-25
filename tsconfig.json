@@ -3,7 +3,7 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "es6",
-    "target": "es2018",
+    "target": "esnext",
     "outDir": "build"
   },
   "include": ["src/**/*.ts"],
