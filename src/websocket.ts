@@ -46,7 +46,7 @@ export function start(domain: string, data): Socket {
     let getViewTimeoutId = 0;
 
     function getView() {
-      if (!document.hidden) {
+      if (!document.hidden && socket.ws.readyState === WebSocket.OPEN) {
         sendMessage(socket, {type: 'hero/getView'});
         getViewTimeoutId = setTimeout(getView, viewPingInterval);       
       }

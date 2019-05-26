@@ -8,7 +8,13 @@ async function main() {
   await listenAndServe(':8030', async req => {
     console.log('got request');
     try {
-      const ws = await acceptWebSocket(req);
+      const {conn, headers} = req;
+      const ws = await acceptWebSocket({
+        conn,
+        headers,
+        bufReader: req.r,
+        bufWriter: req.w,
+      });
       console.log('upgraded connection');
       manageWebSocket(ws);
     } catch (error) {
@@ -19,10 +25,24 @@ async function main() {
 main();
 
 async function manageWebSocket(ws: WebSocket) {
-  for await (let event of ws.receive()) {
+  /*
+  const iterator = ws.receive();
+
+  while (true) {
+    const {done, value} = await iterator.next();
+    if (done) {
+      console.log('done');
+      break;
+    }
+    console.log('got event', value);
+  }
+  */
+
+  for await (const event of ws.receive()) {
     if (typeof event === 'string') {
       try {
         const message = JSON.parse(event);
+        console.log('got message', message);
         handleMessage(ws, message);
       } catch (error) {
         console.warn('could not parse websocket string event', JSON.stringify(event));

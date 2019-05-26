@@ -1,4 +1,4 @@
-#!/usr/bin/env deno --allow-run
+#!/usr/bin/env deno run --allow-run
 
 import {dirname, resolve} from 'https://deno.land/std/fs/path.ts';
 
@@ -8,7 +8,7 @@ const {run} = Deno;
 
 async function main() {
   const server = run({
-    args: ['deno', 'https://deno.land/std/http/file_server.ts'],
+    args: ['deno', 'run', 'https://deno.land/std/http/file_server.ts'],
     cwd: buildDir,
   });
 

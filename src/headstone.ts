@@ -1,4 +1,4 @@
-import * as p from './utils/point.js';
+import * as p from './utils/point.ts';
 
 export interface Type extends p.Point {
   id: string;
