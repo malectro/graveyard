@@ -1,4 +1,4 @@
-import * as PointMath from './utils/point.ts';
+import * as PointMath from './utils/point.js';
 
 type PixiApp = any;
 
@@ -9,6 +9,7 @@ export default class View {
   readonly camera: {
     paddingPercentage: number;
     maxDistance: PointMath.Point;
+    position: PointMath.Point;
   };
 
   constructor(
@@ -34,6 +35,7 @@ export default class View {
       camera: {
         paddingPercentage: cameraPaddingPercentage,
         maxDistance: cameraMaxDistance,
+        poisition: {x: 0, y: 0},
       },
     });
   }
@@ -70,5 +72,14 @@ export default class View {
     } else if (cameraDistanceY < -this.camera.maxDistance.y) {
       this.setCameraY(point.y + this.camera.maxDistance.y);
     }
+  }
+
+  isInLoadRange(point: PointMath.Point) {
+    return (
+      point.x > this.app.stage.x - this.size.x &&
+      point.x < this.app.stage.x + this.size.x * 2 &&
+      point.y > this.app.stage.y - this.size.y ||
+      point.y < this.app.stage.y + this.size.y * 2 
+    );
   }
 }

@@ -1,12 +1,15 @@
-import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages';
-import * as p from './utils/point';
+//import * as rxjs from 'rxjs';
 
-interface Socket {
+import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.js';
+import * as p from './utils/point.js';
+import {State} from './state.js';
+
+export interface Socket {
   ws: WebSocket;
   domain: string;
 }
 
-export function start(domain: string, data): Socket {
+export function start(domain: string, state: State): Socket {
   const socket = {
     ws: null,
     domain,
@@ -32,18 +35,31 @@ export function start(domain: string, data): Socket {
       console.log('connection was closed.');
     });
 
-    rxjs.fromEvent(ws, 'message').forEach((message: WebSocketOutgoingMessage) => {
+    rxjs.fromEvent(ws, 'message').forEach((event: MessageEvent) => {
+      let message;
+
+      try {
+        message = <WebSocketOutgoingMessage>JSON.parse(event.data); 
+      } catch (error) {
+        console.log('got un-parsable message', event);
+        return;
+      }
+
       switch (message.type) {
         case 'hero/view': {
           const {headstones, hero} = message.payload;
-          data.headstones = headstones; 
-          data.hero = hero;
+          for (const headstone of headstones) {
+            if (!state.headstones.has(headstone.id)) {
+              state.headstones.set(headstone.id, headstone);
+            }
+          }
+          state.hero = hero;
         }
       }
     });
 
     const viewPingInterval = 1000;
-    let getViewTimeoutId = 0;
+    let getViewTimeoutId;
 
     function getView() {
       if (!document.hidden && socket.ws.readyState === WebSocket.OPEN) {

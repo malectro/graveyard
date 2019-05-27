@@ -1,6 +1,6 @@
-import * as p from './utils/point.ts';
-import * as Hero from './hero.ts';
-import * as Headstone from './headstone.ts';
+import * as p from './utils/point.js';
+import * as Hero from './hero.js';
+import * as Headstone from './headstone.js';
 
 interface WebSocketMessageSimple<T extends string> {
   type: T;

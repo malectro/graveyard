@@ -58,3 +58,17 @@ export function assignMin(point: Point) {
   point.y = min;
   return point;
 }
+
+export function isInBox(point: Point, position: Point, size: Point): boolean {
+  return point.x < position.x || point.y < position.y || point.x > position.x + size.x || point.y > position.y + size.y;
+}
+
+export function distance(pointA: Point, pointB: Point): number {
+  const deltaX = pointA.x - pointB.x;
+  const deltaY = pointA.y - pointB.y;
+  return Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+}
+
+export function cheapDistance(pointA: Point, pointB: Point): number {
+  return Math.abs(pointA.x - pointB.x) + Math.abs(pointA.y - pointB.y);
+}

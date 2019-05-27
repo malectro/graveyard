@@ -1,8 +1,9 @@
 import * as PointMath from './utils/point.js';
-
 import * as Hero from './hero.js';
+import {Socket, sendMessage} from './websocket.js';
+import {State} from './state.js';
 
-export function init(hero: Hero.HeroType) {
+export function init(state: State, socket: Socket) {
   const keys = {
     ArrowDown: {x: 0, y: 1},
     ArrowUp: {x: 0, y: -1},
@@ -23,8 +24,8 @@ export function init(hero: Hero.HeroType) {
         if (!currentKeys.has(event.key)) {
           currentKeys.add(event.key);
 
-          PointMath.add(hero.direction, key);
-          Hero.resolveVelocity(hero);
+          PointMath.add(state.hero.direction, key);
+          resolveVelocity();
         }
       }
     },
@@ -41,11 +42,22 @@ export function init(hero: Hero.HeroType) {
 
         if (currentKeys.has(event.key)) {
           currentKeys.delete(event.key);
-          PointMath.subtract(hero.direction, key);
-          Hero.resolveVelocity(hero);
+
+          PointMath.subtract(state.hero.direction, key);
+          resolveVelocity();
+          console.log('hero is at', state.hero.x, state.hero.y);
         }
       }
     },
     {capture: true},
   );
+
+  function resolveVelocity() {
+    Hero.move(state.hero, Date.now());
+    Hero.resolveVelocity(state.hero);
+    sendMessage(socket, {
+      type: 'hero/move',
+      payload: state.hero.direction,
+    });
+  }
 }

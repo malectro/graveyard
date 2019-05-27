@@ -13,7 +13,7 @@ if (args[1] === 'dev')  {
 }
 
 const srcDir = resolve(projectRoot, 'src');
-const buildDir = resolve(projectRoot, 'build');
+const buildDir = resolve(projectRoot, 'build', 'client');
 
 async function main() {
   console.log('building to', buildDir);
@@ -21,6 +21,7 @@ async function main() {
 
   let promises = new Set();
 
+  /*
   for await (const {filename} of walk(
     srcDir,
     {exts: ['ts'], skip: [/server.ts$/]},
@@ -31,6 +32,7 @@ async function main() {
       promises.delete(promise);
     });
   }
+  */
 
   for await (const {filename} of walk(
     srcDir,
@@ -75,6 +77,15 @@ async function main() {
   });
 
   await process.status();
+
+  await run({
+    args: [
+      'tsc',
+      '--project',
+      'tsconfig.node.json'
+    ],
+    cwd: projectRoot,
+  }).status();
 }
 
 main();

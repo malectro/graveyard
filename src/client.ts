@@ -7,20 +7,19 @@
 import {scale, repeat} from './utils/array.js';
 import * as p from './utils/point.js';
 
+import createState from './state.js';
 import * as Hero from './hero.js';
 import * as Headstone from './headstone.js';
 import View from './view.js';
 import * as Controls from './controls.js';
 import * as ws from './websocket.js';
+import Pool from './utils/pool.js';
 
-
-const hero = Hero.create();
-const data = {
-  hero,
-  headstones: [],
-};
+const state = createState();
 
 async function main() {
+  const {hero, headstones} = state;
+
   const app = new PIXI.Application({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -48,47 +47,61 @@ async function main() {
 
   app.stage.addChild(world);
 
-  const stones: Headstone.Type[] = [
-    {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
-    {id: '2', x: 50, y: 100, text: 'Here lies Kyle'},
-    {id: '3', x: 300, y: 150, text: 'Here lies Kyle'},
-  ];
-
   const greenShader = new PIXI.Shader(solidColorProgram, {
     uColor: [0.5, 0.8, 0.5],
   });
-  const headstoneMeshes = stones.map(stone => {
-    const headstoneMesh = new PIXI.Mesh(headstoneGeometry, greenShader);
-    headstoneMesh.position.set(stone.x, stone.y);
-    world.addChild(headstoneMesh);
-    return headstoneMesh;
-  });
-
   const pinkShader = new PIXI.Shader(solidColorProgram, {
     uColor: [0.8, 0.5, 0.5],
   });
+
   const heroMesh = new PIXI.Mesh(headstoneGeometry, pinkShader);
   heroMesh.position.set(hero.x, hero.y);
   app.stage.addChild(heroMesh);
 
   view.setCameraPosition(hero);
 
+  //const headstoneMeshMap = new WeakMap();
+  const headstoneMap = new Map();
+
   app.ticker.add(_delta => {
+    const now = Date.now();
+    const {hero, headstones} = state;
+
     // TODO (kyle): only do any of this if the hero is moving
-    p.add(hero, hero.velocity);
+    Hero.move(hero, now);
     heroMesh.position.set(hero.x, hero.y);
     view.focusCamera(hero);
+
+    for (const [id, headstone] of state.headstones) {
+      if (!headstone.mesh) {
+        headstone.mesh = headstoneMeshPool.request();
+        headstone.mesh.position.set(headstone.x, headstone.y);
+        world.addChild(headstone.mesh);
+      }
+
+      // cull
+      if (!view.isInLoadRange(headstone)) {
+        world.removeChild(headstone.mesh);
+        headstoneMeshPool.retire(headstone.mesh);
+        state.headstones.delete(headstone.id);
+      }
+    }
   });
 
-  Controls.init(hero);
+  const socket = ws.start('localhost:8030', state);
+  Controls.init(state, socket);
 
-  ws.start('localhost:8030', data);
+  const headstoneMeshPool = new Pool(
+    () => (
+      new PIXI.Mesh(headstoneGeometry, greenShader)
+    ),
+  );
 }
 
 main();
 
 /*
-*/
+ */
 
 /*
 window.addEventListener('resize', () => {
