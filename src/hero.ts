@@ -16,7 +16,7 @@ export function create(): HeroType {
     name: 'Kyle',
     x: 0,
     y: 0,
-    speed: 0.2,
+    speed: 1,
     direction: p.point(),
     velocity: p.point(),
     lastUpdate: Date.now(),

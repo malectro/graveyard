@@ -3,13 +3,14 @@
 import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.js';
 import * as p from './utils/point.js';
 import {State} from './state.js';
+import View from './view.js';
 
 export interface Socket {
   ws: WebSocket;
   domain: string;
 }
 
-export function start(domain: string, state: State): Socket {
+export function start(domain: string, state: State, view: View): Socket {
   const socket = {
     ws: null,
     domain,
@@ -63,7 +64,7 @@ export function start(domain: string, state: State): Socket {
 
     function getView() {
       if (!document.hidden && socket.ws.readyState === WebSocket.OPEN) {
-        sendMessage(socket, {type: 'hero/getView'});
+        sendMessage(socket, {type: 'hero/getView', payload: view.getViewBox()});
         getViewTimeoutId = setTimeout(getView, viewPingInterval);       
       }
     }

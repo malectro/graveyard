@@ -3,6 +3,7 @@ import * as WebSocket from 'ws';
 import {WebSocketIncomingMessage, WebSocketOutgoingMessage} from './messages';
 import * as Hero from './hero';
 import * as Headstone from './headstone';
+import * as p from './utils/point';
 
 
 const wss = new WebSocket.Server({ port: 8030 });
@@ -29,7 +30,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
         type: 'hero/view',
         payload: {
           hero: heroes[heroId],
-          headstones,
+          headstones: [],
         },
       });
       break;
@@ -44,6 +45,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
     }
 
     case 'hero/getView': {
+      const {position, size} = message.payload;
       const now = Date.now();
       const hero = heroes[heroId];
       Hero.move(hero, now);
@@ -51,7 +53,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
         type: 'hero/view',
         payload: {
           hero,
-          headstones,
+          headstones: getHeadstonesInView(position, size),
         },
       });
       break;
@@ -64,6 +66,11 @@ function sendMessage(ws: WebSocket, message: WebSocketOutgoingMessage) {
   ws.send(JSON.stringify(message));
 }
 
+function getHeadstonesInView(viewPoint: p.Point, viewSize: p.Point) {
+  // TODO (kyle): this should be geo indexed
+  return headstones.filter(headstone => p.isInBox(headstone, viewPoint, viewSize));
+}
+
 const heroId = '1';
 let heroes = {
   '1': Hero.create(),
@@ -73,4 +80,5 @@ const headstones: Headstone.Type[] = [
   {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
   {id: '2', x: 50, y: 100, text: 'Here lies Kyle'},
   {id: '3', x: 300, y: 150, text: 'Here lies Kyle'},
+  {id: '4', x: 4000, y: 150, text: 'Here lies Kyle'},
 ];

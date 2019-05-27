@@ -74,6 +74,7 @@ async function main() {
 
     for (const [id, headstone] of state.headstones) {
       if (!headstone.mesh) {
+        console.log('adding', headstone.id);
         headstone.mesh = headstoneMeshPool.request();
         headstone.mesh.position.set(headstone.x, headstone.y);
         world.addChild(headstone.mesh);
@@ -81,6 +82,7 @@ async function main() {
 
       // cull
       if (!view.isInLoadRange(headstone)) {
+        console.log('culling', headstone.id);
         world.removeChild(headstone.mesh);
         headstoneMeshPool.retire(headstone.mesh);
         state.headstones.delete(headstone.id);
@@ -88,7 +90,7 @@ async function main() {
     }
   });
 
-  const socket = ws.start('localhost:8030', state);
+  const socket = ws.start('localhost:8030', state, view);
   Controls.init(state, socket);
 
   const headstoneMeshPool = new Pool(

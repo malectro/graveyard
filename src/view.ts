@@ -35,16 +35,19 @@ export default class View {
       camera: {
         paddingPercentage: cameraPaddingPercentage,
         maxDistance: cameraMaxDistance,
-        poisition: {x: 0, y: 0},
+        position: {x: 0, y: 0},
       },
     });
   }
 
   setCameraX(x: number) {
+    this.camera.position.x = x;
     this.app.stage.x = this.halfSize.x - x;
     return this;
   }
+
   setCameraY(y: number) {
+    this.camera.position.y = y;
     this.app.stage.y = this.halfSize.y - y;
     return this;
   }
@@ -76,10 +79,17 @@ export default class View {
 
   isInLoadRange(point: PointMath.Point) {
     return (
-      point.x > this.app.stage.x - this.size.x &&
-      point.x < this.app.stage.x + this.size.x * 2 &&
-      point.y > this.app.stage.y - this.size.y ||
-      point.y < this.app.stage.y + this.size.y * 2 
+      point.x > this.camera.position.x - this.size.x &&
+      point.x < this.camera.position.x + this.size.x &&
+      point.y > this.camera.position.y - this.size.y &&
+      point.y < this.camera.position.y + this.size.y 
     );
+  }
+
+  getViewBox() {
+    return {
+      position: PointMath.subtract({...this.camera.position}, this.size),
+      size: PointMath.scale({...this.size}, 2),
+    };
   }
 }
