@@ -1,0 +1,3 @@
+- [ ] use es6 classes for sprites
+- [ ] add pixel art assets
+- [ ] create tombstone creation flow
