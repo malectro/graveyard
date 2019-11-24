@@ -3,10 +3,10 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "es6",
-    "target": "es2018",
+    "target": "esnext",
     "lib": ["dom", "esnext"],
-    "outDir": "build/client",
+    "outDir": "build/client"
   },
-  "files": ["src/client.ts", "src/globals.d.ts"],
-  "exclude": ["node_modules"],
+  "files": ["src/client.ts"],
+  "exclude": ["node_modules"]
 }

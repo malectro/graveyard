@@ -48,10 +48,10 @@ export function start(domain: string, state: State, view: View): Socket {
 
       switch (message.type) {
         case 'hero/view': {
-          const {headstones, hero} = message.payload;
-          for (const headstone of headstones) {
-            if (!state.headstones.has(headstone.id)) {
-              state.headstones.set(headstone.id, headstone);
+          const {sprites, hero} = message.payload;
+          for (const sprite of sprites) {
+            if (!state.sprites.has(sprite.id)) {
+              state.sprites.set(sprite.id, sprite);
             }
           }
           state.hero = hero;
@@ -65,14 +65,14 @@ export function start(domain: string, state: State, view: View): Socket {
     function getView() {
       if (!document.hidden && socket.ws.readyState === WebSocket.OPEN) {
         sendMessage(socket, {type: 'hero/getView', payload: view.getViewBox()});
-        getViewTimeoutId = setTimeout(getView, viewPingInterval);       
+        getViewTimeoutId = setTimeout(getView, viewPingInterval);
       }
     }
 
     rxjs.fromEvent(document, 'visibilitychange').forEach(() => {
       if (!document.hidden) {
         clearTimeout(getViewTimeoutId);
-        getView();        
+        getView();
       }
     });
   }

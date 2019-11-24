@@ -1,0 +1,31 @@
+{
+  "name": "graveyard",
+  "version": "0.0.0",
+  "description": "",
+  "main": "build/client.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/malectro/graveyard.git"
+  },
+  "author": "Kyle Warren",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/malectro/graveyard/issues"
+  },
+  "homepage": "https://github.com/malectro/graveyard#readme",
+  "dependencies": {
+    "pixi.js": "^5.2.0",
+    "rxjs": "^6.5.3",
+    "ws": "^7.2.0"
+  },
+  "devDependencies": {
+    "rollup": "^1.27.4",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "typescript": "^3.7.2"
+  }
+}

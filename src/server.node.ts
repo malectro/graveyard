@@ -4,6 +4,7 @@ import {WebSocketIncomingMessage, WebSocketOutgoingMessage} from './messages';
 import * as Hero from './hero';
 import * as Headstone from './headstone';
 import * as p from './utils/point';
+import {Sprite} from './sprite';
 
 
 const wss = new WebSocket.Server({ port: 8030 });
@@ -30,7 +31,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
         type: 'hero/view',
         payload: {
           hero: heroes[heroId],
-          headstones: [],
+          sprites: [],
         },
       });
       break;
@@ -53,7 +54,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
         type: 'hero/view',
         payload: {
           hero,
-          headstones: getHeadstonesInView(position, size),
+          sprites: getSpritesInView(position, size),
         },
       });
       break;
@@ -71,14 +72,24 @@ function getHeadstonesInView(viewPoint: p.Point, viewSize: p.Point) {
   return headstones.filter(headstone => p.isInBox(headstone, viewPoint, viewSize));
 }
 
+function getSpritesInView(viewPoint: p.Point, viewSize: p.Point) {
+  // TODO (kyle): this should be geo indexed
+  return map.filter(sprite => p.isInBox(sprite, viewPoint, viewSize));
+}
+
 const heroId = '1';
 let heroes = {
   '1': Hero.create(),
 };
 
 const headstones: Headstone.Type[] = [
-  {id: '1', x: 0, y: 0, text: 'Here lies Kyle'},
-  {id: '2', x: 50, y: 100, text: 'Here lies Kyle'},
-  {id: '3', x: 300, y: 150, text: 'Here lies Kyle'},
-  {id: '4', x: 4000, y: 150, text: 'Here lies Kyle'},
+];
+
+const map: Sprite[] = [
+  {id: '1', type: 'headstone', x: 0, y: 0, data: {text: 'Here lies Kyle'}},
+  {id: '2', type: 'headstone', x: 50, y: 100, data: {text: 'Here lies Kyle'}},
+  {id: '3', type: 'headstone', x: 300, y: 150, data: {text: 'Here lies Kyle'}},
+  {id: '4', type: 'headstone', x: 4000, y: 150, data: {text: 'Here lies Kyle'}},
+  {id: '5', type: 'grass', x: -100, y: 0},
+  {id: '6', type: 'tree', x: -300, y: 100},
 ];

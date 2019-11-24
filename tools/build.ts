@@ -68,10 +68,20 @@ async function main() {
 
   console.log('Compiling...');
 
+  /*
   const process = run({
     args: [
       'tsc',
       //...tscArgs,
+    ],
+    cwd: projectRoot,
+  });
+  */
+  const process = run({
+    args: [
+      'npm',
+      'run',
+      'build',
     ],
     cwd: projectRoot,
   });

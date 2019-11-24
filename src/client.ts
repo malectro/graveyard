@@ -1,7 +1,8 @@
 //import './webgl.js';
 //import * as PIXI from 'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.8.7/pixi.min.js';
 //import * as PIXI from '../node_modules/pixi.js/dist/pixi.js';
-//import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
+import {Observable} from 'rxjs';
 //import {Observable} from 'https://raw.githubusercontent.com/ReactiveX/rxjs/master/src/index.ts';
 
 import {scale, repeat} from './utils/array.js';
@@ -17,8 +18,10 @@ import Pool from './utils/pool.js';
 
 const state = createState();
 
+(<any>window).__state = state;
+
 async function main() {
-  const {hero, headstones} = state;
+  const {hero, headstones, sprites} = state;
 
   const app = new PIXI.Application({
     width: window.innerWidth,
@@ -65,27 +68,27 @@ async function main() {
 
   app.ticker.add(_delta => {
     const now = Date.now();
-    const {hero, headstones} = state;
+    const {hero, headstones, sprites} = state;
 
     // TODO (kyle): only do any of this if the hero is moving
     Hero.move(hero, now);
     heroMesh.position.set(hero.x, hero.y);
     view.focusCamera(hero);
 
-    for (const [id, headstone] of state.headstones) {
-      if (!headstone.mesh) {
-        console.log('adding', headstone.id);
-        headstone.mesh = headstoneMeshPool.request();
-        headstone.mesh.position.set(headstone.x, headstone.y);
-        world.addChild(headstone.mesh);
+    for (const [id, sprite] of state.sprites) {
+      if (!sprite.mesh) {
+        console.log('adding', sprite.id);
+        sprite.mesh = headstoneMeshPool.request();
+        sprite.mesh.position.set(sprite.x, sprite.y);
+        world.addChild(sprite.mesh);
       }
 
       // cull
-      if (!view.isInLoadRange(headstone)) {
-        console.log('culling', headstone.id);
-        world.removeChild(headstone.mesh);
-        headstoneMeshPool.retire(headstone.mesh);
-        state.headstones.delete(headstone.id);
+      if (!view.isInLoadRange(sprite)) {
+        console.log('culling', sprite.id);
+        world.removeChild(sprite.mesh);
+        headstoneMeshPool.retire(sprite.mesh);
+        state.sprites.delete(sprite.id);
       }
     }
   });

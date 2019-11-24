@@ -1,6 +1,7 @@
 import * as p from './utils/point.js';
 import * as Hero from './hero.js';
 import * as Headstone from './headstone.js';
+import {Sprite} from './sprite.js';
 
 interface WebSocketMessageSimple<T extends string> {
   type: T;
@@ -27,6 +28,6 @@ export type HeroLocationMessage = WebSocketMessage<
 >;
 export type HeroViewMessage = WebSocketMessage<
   'hero/view',
-  {hero: Hero.HeroType; headstones: Headstone.Type[]}
+  {hero: Hero.HeroType; sprites: Sprite[]}
 >;
 export type WebSocketOutgoingMessage = HeroLocationMessage | HeroViewMessage;
