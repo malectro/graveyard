@@ -1,4 +1,4 @@
-import {dirname, resolve} from 'https://deno.land/std/fs/path.ts';
+import {dirname, resolve} from 'https://deno.land/std/path/mod.ts';
 
 export const projectRoot = resolve(dirname(location.pathname), '..');
 export const srcDir = resolve(projectRoot, 'src');

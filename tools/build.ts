@@ -1,7 +1,7 @@
 #!/usr/bin/env deno run --allow-all
 
 import {emptyDir, ensureDir, walk} from 'https://deno.land/std/fs/mod.ts';
-import {dirname, resolve} from 'https://deno.land/std/fs/path.ts';
+import {dirname, resolve} from 'https://deno.land/std/path/mod.ts';
 
 import {projectRoot} from './common.ts';
 
@@ -13,10 +13,11 @@ if (args[1] === 'dev')  {
 }
 
 const srcDir = resolve(projectRoot, 'src');
-const buildDir = resolve(projectRoot, 'build', 'client');
+const buildDir = resolve(projectRoot, 'build');
 
 async function main() {
   console.log('building to', buildDir);
+  ensureDir(buildDir);
   emptyDir(buildDir);
 
   let promises = new Set();
@@ -34,9 +35,10 @@ async function main() {
   }
   */
 
+  console.log('copying statics');
   for await (const {filename} of walk(
     srcDir,
-    {skip: [/\.ts$/]},
+    {includeDirs: false, skip: [/\.ts$/]},
   )) {
     let promise = copyToBuild(filename) ;
     promises.add(promise);
@@ -90,7 +92,7 @@ async function main() {
 
   await run({
     args: [
-      'tsc',
+      'node_modules/.bin/tsc',
       '--project',
       'tsconfig.node.json'
     ],
@@ -119,6 +121,7 @@ async function copyToBuild(filename) {
   const buildFilename = getBuildFilename(filename);
   const buildFileDir = dirname(buildFilename); 
   await ensureDir(buildFileDir);
+  console.log('copying file', filename, buildFilename);
   await copyFile(filename, buildFilename);
 }
 
