@@ -71,7 +71,9 @@ async function main() {
     const {hero, headstones, sprites} = state;
 
     // TODO (kyle): only do any of this if the hero is moving
-    Hero.move(hero, now);
+    if (Hero.isMoving(hero)) {
+      Hero.move(hero, sprites.values(), now);
+    }
     heroMesh.position.set(hero.x, hero.y);
     view.focusCamera(hero);
 

@@ -3,6 +3,8 @@ export interface Point {
   y: number;
 }
 
+export type Vector2 = Point;
+
 // TODO (kyle): could do more immutable operations if we pool these.
 
 export function point(x: number = 0, y: number = 0) {
@@ -11,6 +13,10 @@ export function point(x: number = 0, y: number = 0) {
   };
 }
 export const create = point;
+
+export function copy(source: Point): Point {
+  return point(source.x, source.y);
+}
 
 export function add<T extends Point>(target: T, source: Point): T {
   target.x += source.x;
@@ -71,4 +77,8 @@ export function distance(pointA: Point, pointB: Point): number {
 
 export function cheapDistance(pointA: Point, pointB: Point): number {
   return Math.abs(pointA.x - pointB.x) + Math.abs(pointA.y - pointB.y);
+}
+
+export function isZero(point: Point): boolean {
+  return point.x === 0 && point.y === 0;
 }

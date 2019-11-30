@@ -25,6 +25,7 @@ export function init(state: State, socket: Socket) {
           currentKeys.add(event.key);
 
           PointMath.add(state.hero.direction, key);
+          state.hero.lastUpdate = Date.now();
           resolveVelocity();
         }
       }
@@ -53,7 +54,7 @@ export function init(state: State, socket: Socket) {
   );
 
   function resolveVelocity() {
-    Hero.move(state.hero, Date.now());
+    //Hero.move(state.hero, state.sprites.values(), Date.now());
     Hero.resolveVelocity(state.hero);
     sendMessage(socket, {
       type: 'hero/move',

@@ -6,6 +6,8 @@ export interface Sprite extends p.Point, Graphic {
   id: string;
   type: string;
   data?: unknown;
+  width: number;
+  height: number;
 }
 
 export function create(type: string, props?: Partial<Sprite>): Sprite {
@@ -16,6 +18,12 @@ export function create(type: string, props?: Partial<Sprite>): Sprite {
     y: 0,
     mesh: null,
     data: null,
+    width: SpriteSize.x,
+    height: SpriteSize.y,
     ...props,
   };
 }
+
+export const SpriteSize = {
+  x: 50, y: 50,
+};

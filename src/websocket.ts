@@ -1,4 +1,4 @@
-//import * as rxjs from 'rxjs';
+import * as rxjs from 'rxjs';
 
 import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.js';
 import * as p from './utils/point.js';
@@ -54,7 +54,7 @@ export function start(domain: string, state: State, view: View): Socket {
               state.sprites.set(sprite.id, sprite);
             }
           }
-          state.hero = hero;
+          //state.hero = hero;
         }
       }
     });

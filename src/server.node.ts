@@ -38,7 +38,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
 
     case 'hero/move': {
       const hero = heroes[heroId];
-      Hero.move(hero, Date.now());
+      Hero.move(hero, map.values(), Date.now());
       console.log('hero is at', hero.x, hero.y);
       hero.direction = message.payload;
       Hero.resolveVelocity(hero);
@@ -49,7 +49,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
       const {position, size} = message.payload;
       const now = Date.now();
       const hero = heroes[heroId];
-      Hero.move(hero, now);
+      Hero.move(hero, map.values(), now);
       sendMessage(ws, {
         type: 'hero/view',
         payload: {
@@ -86,10 +86,10 @@ const headstones: Headstone.Type[] = [
 ];
 
 const map: Sprite[] = [
-  {id: '1', type: 'headstone', x: 0, y: 0, data: {text: 'Here lies Kyle'}},
-  {id: '2', type: 'headstone', x: 50, y: 100, data: {text: 'Here lies Kyle'}},
-  {id: '3', type: 'headstone', x: 300, y: 150, data: {text: 'Here lies Kyle'}},
-  {id: '4', type: 'headstone', x: 4000, y: 150, data: {text: 'Here lies Kyle'}},
-  {id: '5', type: 'grass', x: -100, y: 0},
-  {id: '6', type: 'tree', x: -300, y: 100},
+  {id: '1', type: 'headstone', x: 200, y: 100, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
+  {id: '2', type: 'headstone', x: 50, y: 100, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
+  {id: '3', type: 'headstone', x: 300, y: 150, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
+  {id: '4', type: 'headstone', x: 4000, y: 150, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
+  {id: '5', type: 'grass', x: -100, y: 200, width: 50, height: 50},
+  {id: '6', type: 'tree', x: -300, y: 100, width: 50, height: 50},
 ];

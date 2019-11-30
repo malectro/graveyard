@@ -5,6 +5,7 @@
     "module": "es6",
     "target": "esnext",
     "lib": ["dom", "esnext"],
+    "downlevelIteration": true,
     "outDir": "build/client"
   },
   "files": ["src/client.ts"],
