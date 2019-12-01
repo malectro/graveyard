@@ -3,6 +3,7 @@ import {intersectSegment} from './utils/box';
 import {Graphic} from './utils/graphic.js';
 import {reduce} from './utils/iterable';
 import {Sprite} from './sprite';
+import {Entity} from './entity';
 
 export interface HeroType extends p.Point, Graphic {
   id: string;
@@ -39,7 +40,7 @@ export function isMoving(hero: HeroType): boolean {
   return !p.isZero(hero.velocity);
 }
 
-export function move(hero: HeroType, sprites: IterableIterator<Sprite>, now: number): HeroType {
+export function move(hero: HeroType, entities: IterableIterator<Entity>, now: number): HeroType {
   const duration = now - hero.lastUpdate;
   const travelVector = 
     p.scale({...hero.velocity}, duration);
@@ -49,8 +50,8 @@ export function move(hero: HeroType, sprites: IterableIterator<Sprite>, now: num
     travelVector,
   );
 
-  const intersection = reduce(sprites, (info, sprite) => {
-    const point = intersectSegment(sprite, hero, hero.futurePosition);
+  const intersection = reduce(entities, (info, entity) => {
+    const point = intersectSegment(entity.box, hero, hero.futurePosition);
     if (point) {
       const distance = p.cheapDistance(hero, point);
       if (distance < info.d) {

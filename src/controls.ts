@@ -1,7 +1,7 @@
-import * as PointMath from './utils/point.js';
-import * as Hero from './hero.js';
-import {Socket, sendMessage} from './websocket.js';
-import {State} from './state.js';
+import * as PointMath from './utils/point';
+import * as Hero from './hero';
+import {Socket, sendMessage} from './websocket';
+import State from './state2';
 
 export function init(state: State, socket?: Socket) {
   const keys = {

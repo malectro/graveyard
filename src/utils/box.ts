@@ -1,26 +1,27 @@
 import * as p from './point';
+import {Entity} from '../entity';
 
 
-interface Box {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+export interface Box {
+  position: p.Vector2;
+  size: p.Vector2;
 }
 
 export function intersectSegment(box: Box, rayOrigin: p.Point, rayTerminus: p.Vector2): null | p.Point {
-  const bottom = box.y + box.height;
-  const right = box.x + box.width;
+  const {position, size} = box;
+
+  const bottom = position.y + size.x;
+  const right = position.x + size.y;
 
   const topLeft = box;
-  const bottomLeft = p.create(box.x, bottom);
+  const bottomLeft = p.create(position.x, bottom);
   const bottomRight = p.create(right, bottom);
-  const topRight = p.create(right, box.y);
+  const topRight = p.create(right, position.y);
 
-  const face1 = intersectLines(rayOrigin, rayTerminus, box, topRight);
+  const face1 = intersectLines(rayOrigin, rayTerminus, position, topRight);
   const face2 = intersectLines(rayOrigin, rayTerminus, topRight, bottomRight);
   const face3 = intersectLines(rayOrigin, rayTerminus, bottomRight, bottomLeft);
-  const face4 = intersectLines(rayOrigin, rayTerminus, bottomLeft, box);
+  const face4 = intersectLines(rayOrigin, rayTerminus, bottomLeft, position);
 
   let closestDistance = Infinity;
   let closestFace = null;

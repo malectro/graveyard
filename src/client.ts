@@ -8,6 +8,9 @@ import {Observable} from 'rxjs';
 import {scale, repeat} from './utils/array.js';
 import * as p from './utils/point.js';
 
+import stateJson from './data/state';
+import State from './state2';
+import {loadShaders} from './graphic';
 import {entities} from './entities';
 import createState from './state.js';
 import * as Hero from './hero.js';
@@ -19,12 +22,18 @@ import Pool from './utils/pool.js';
 
 const state = createState();
 
-(<any>window).__state = state;
+//(<any>window).__state = state;
 
 state.sprites = new Map(entities.map(entity => [entity.id, entity]));
 
 async function main() {
-  const {hero, headstones, sprites} = state;
+  await loadShaders();
+
+  const state2 = State.fromJSON(stateJson);
+  console.log('state', state2);
+
+  //(<any>window).__state2 = state2;
+  //const {hero, headstones, sprites} = state;
 
   const app = new PIXI.Application({
     width: window.innerWidth,
@@ -51,6 +60,11 @@ async function main() {
 
   const world = new PIXI.Container();
 
+  for (const entity of state2.entities.values()) {
+    console.log('adding', entity, entity.graphic.mesh);
+    world.addChild(entity.graphic.mesh);
+  }
+
   app.stage.addChild(world);
 
   const greenShader = new PIXI.Shader(solidColorProgram, {
@@ -59,6 +73,8 @@ async function main() {
   const pinkShader = new PIXI.Shader(solidColorProgram, {
     uColor: [0.8, 0.5, 0.5],
   });
+
+  const {hero} = state2;
 
   const heroMesh = new PIXI.Mesh(headstoneGeometry, pinkShader);
   heroMesh.position.set(hero.x, hero.y);
@@ -71,23 +87,17 @@ async function main() {
 
   app.ticker.add(_delta => {
     const now = Date.now();
-    const {hero, headstones, sprites} = state;
+    const {hero, entities} = state2;
 
     // TODO (kyle): only do any of this if the hero is moving
     if (Hero.isMoving(hero)) {
-      Hero.move(hero, sprites.values(), now);
+      Hero.move(hero, entities.values(), now);
     }
     heroMesh.position.set(hero.x, hero.y);
     view.focusCamera(hero);
 
-    for (const [id, sprite] of state.sprites) {
-      if (!sprite.mesh) {
-        console.log('adding', sprite.id);
-        sprite.mesh = headstoneMeshPool.request();
-        sprite.mesh.position.set(sprite.x, sprite.y);
-        world.addChild(sprite.mesh);
-      }
-
+      /*
+    for (const [id, entity] of entities) {
       // cull
       if (!view.isInLoadRange(sprite)) {
         console.log('culling', sprite.id);
@@ -96,12 +106,13 @@ async function main() {
         state.sprites.delete(sprite.id);
       }
     }
+       */
   });
 
   // TODO (kyle): use websocket
   //const socket = ws.start('localhost:8030', state, view);
   //Controls.init(state, socket);
-  Controls.init(state);
+  Controls.init(state2);
 
   const headstoneMeshPool = new Pool(
     () => (
