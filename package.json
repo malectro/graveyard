@@ -5,6 +5,7 @@
   "main": "build/client.js",
   "scripts": {
     "build": "rollup -c rollup.config.js",
+    "build:dev": "rollup --watch -c rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
