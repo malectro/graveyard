@@ -46,7 +46,7 @@ export function init(state: State, socket: Socket) {
 
           PointMath.subtract(state.hero.direction, key);
           resolveVelocity();
-          console.log('hero is at', state.hero.x, state.hero.y);
+          //console.log('hero is at', state.hero.x, state.hero.y);
         }
       }
     },

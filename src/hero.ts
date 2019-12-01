@@ -20,7 +20,7 @@ export function create(): HeroType {
     name: 'Kyle',
     x: 0,
     y: 0,
-    speed: 0.2,
+    speed: 0.5,
     direction: p.point(),
     velocity: p.point(),
     futurePosition: p.point(),
@@ -61,10 +61,8 @@ export function move(hero: HeroType, sprites: IterableIterator<Sprite>, now: num
     return info;
   }, {d: Infinity, p: null});
 
-  console.log('intersection', intersection);
-
   if (intersection.p) {
-    //p.set(hero, intersection.p);
+    p.add(p.set(hero, intersection.p), p.scale(travelVector, -0.1));
   } else {
     p.set(hero, hero.futurePosition);
   }
