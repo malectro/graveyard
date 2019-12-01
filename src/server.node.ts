@@ -5,6 +5,7 @@ import * as Hero from './hero';
 import * as Headstone from './headstone';
 import * as p from './utils/point';
 import {Sprite} from './sprite';
+import {entities} from './entities';
 
 
 const wss = new WebSocket.Server({ port: 8030 });
@@ -38,7 +39,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
 
     case 'hero/move': {
       const hero = heroes[heroId];
-      Hero.move(hero, map.values(), Date.now());
+      Hero.move(hero, entities.values(), Date.now());
       console.log('hero is at', hero.x, hero.y);
       hero.direction = message.payload;
       Hero.resolveVelocity(hero);
@@ -49,7 +50,7 @@ async function handleMessage(ws: WebSocket, message: WebSocketIncomingMessage) {
       const {position, size} = message.payload;
       const now = Date.now();
       const hero = heroes[heroId];
-      Hero.move(hero, map.values(), now);
+      Hero.move(hero, entities.values(), now);
       sendMessage(ws, {
         type: 'hero/view',
         payload: {
@@ -74,7 +75,7 @@ function getHeadstonesInView(viewPoint: p.Point, viewSize: p.Point) {
 
 function getSpritesInView(viewPoint: p.Point, viewSize: p.Point) {
   // TODO (kyle): this should be geo indexed
-  return map.filter(sprite => p.isInBox(sprite, viewPoint, viewSize));
+  return entities.filter(sprite => p.isInBox(sprite, viewPoint, viewSize));
 }
 
 const heroId = '1';
@@ -83,13 +84,4 @@ let heroes = {
 };
 
 const headstones: Headstone.Type[] = [
-];
-
-const map: Sprite[] = [
-  {id: '1', type: 'headstone', x: 200, y: 100, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
-  {id: '2', type: 'headstone', x: 50, y: 100, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
-  {id: '3', type: 'headstone', x: 300, y: 150, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
-  {id: '4', type: 'headstone', x: 4000, y: 150, width: 50, height: 50, data: {text: 'Here lies Kyle'}},
-  {id: '5', type: 'grass', x: -100, y: 200, width: 50, height: 50},
-  {id: '6', type: 'tree', x: -300, y: 100, width: 50, height: 50},
 ];

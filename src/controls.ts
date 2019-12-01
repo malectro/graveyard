@@ -3,7 +3,7 @@ import * as Hero from './hero.js';
 import {Socket, sendMessage} from './websocket.js';
 import {State} from './state.js';
 
-export function init(state: State, socket: Socket) {
+export function init(state: State, socket?: Socket) {
   const keys = {
     ArrowDown: {x: 0, y: 1},
     ArrowUp: {x: 0, y: -1},
@@ -56,9 +56,12 @@ export function init(state: State, socket: Socket) {
   function resolveVelocity() {
     //Hero.move(state.hero, state.sprites.values(), Date.now());
     Hero.resolveVelocity(state.hero);
-    sendMessage(socket, {
-      type: 'hero/move',
-      payload: state.hero.direction,
-    });
+
+    if (socket) {
+      sendMessage(socket, {
+        type: 'hero/move',
+        payload: state.hero.direction,
+      });
+    }
   }
 }

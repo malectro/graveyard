@@ -8,6 +8,7 @@ import {Observable} from 'rxjs';
 import {scale, repeat} from './utils/array.js';
 import * as p from './utils/point.js';
 
+import {entities} from './entities';
 import createState from './state.js';
 import * as Hero from './hero.js';
 import * as Headstone from './headstone.js';
@@ -19,6 +20,8 @@ import Pool from './utils/pool.js';
 const state = createState();
 
 (<any>window).__state = state;
+
+state.sprites = new Map(entities.map(entity => [entity.id, entity]));
 
 async function main() {
   const {hero, headstones, sprites} = state;
@@ -95,8 +98,10 @@ async function main() {
     }
   });
 
-  const socket = ws.start('localhost:8030', state, view);
-  Controls.init(state, socket);
+  // TODO (kyle): use websocket
+  //const socket = ws.start('localhost:8030', state, view);
+  //Controls.init(state, socket);
+  Controls.init(state);
 
   const headstoneMeshPool = new Pool(
     () => (
