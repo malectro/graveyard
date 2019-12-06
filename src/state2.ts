@@ -1,21 +1,27 @@
 import * as Hero from './hero.js';
 import {Asset} from './graphic';
-import {Entity, Species} from './entity';
+import {DynamicPhysics} from './utils/box';
+import {Entity, PhysicsEntity, Species} from './entity';
+import {HeroSpecies} from './hero';
 
 export default class State {
-  hero: Hero.HeroType;
+  hero: PhysicsEntity;
   entities: IdMap<Entity>;
   assets: IdMap<Asset>;
   species: IdMap<Species>;
 
   static fromJSON(json): State {
     const state = Object.assign(new State(), {
-      hero: Hero.create(),
       assets: IdMap.fromJSON(json.assets),
       species: IdMap.fromJSON(json.species),
     });
 
-    state.entities = IdMap.fromJSON(json.entities.map(entity => Entity.fromJSON(state, entity)));
+    state.entities = IdMap.fromJSON(
+      json.entities.map(entity => Entity.fromJSON(state, entity)),
+    );
+
+    state.hero = (state.entities.get(json.hero) as PhysicsEntity);
+    state.hero.box = new DynamicPhysics(state.hero.box);
 
     return state;
   }

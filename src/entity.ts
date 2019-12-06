@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import {Vector2} from './utils/point';
-import {Box} from './utils/box';
+import {Box, PhysicsBox} from './utils/box';
 import Graphic from './graphic';
 
 export class Entity {
@@ -30,6 +30,10 @@ export class Entity {
     entity.graphic.setPosition(entity.box.position);
     return entity;
   }
+}
+
+export interface PhysicsEntity extends Entity {
+  box: PhysicsBox;
 }
 
 export interface Species {

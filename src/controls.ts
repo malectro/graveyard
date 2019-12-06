@@ -24,8 +24,8 @@ export function init(state: State, socket?: Socket) {
         if (!currentKeys.has(event.key)) {
           currentKeys.add(event.key);
 
-          PointMath.add(state.hero.direction, key);
-          state.hero.lastUpdate = Date.now();
+          PointMath.add(state.hero.box.direction, key);
+          state.hero.box.lastUpdate = Date.now();
           resolveVelocity();
         }
       }
@@ -44,9 +44,9 @@ export function init(state: State, socket?: Socket) {
         if (currentKeys.has(event.key)) {
           currentKeys.delete(event.key);
 
-          PointMath.subtract(state.hero.direction, key);
+          PointMath.subtract(state.hero.box.direction, key);
           resolveVelocity();
-          //console.log('hero is at', state.hero.x, state.hero.y);
+          console.log('hero is at', state.hero.box.position.x, state.hero.box.position.y);
         }
       }
     },
@@ -55,12 +55,12 @@ export function init(state: State, socket?: Socket) {
 
   function resolveVelocity() {
     //Hero.move(state.hero, state.sprites.values(), Date.now());
-    Hero.resolveVelocity(state.hero);
+    Hero.resolveVelocity(state.hero.box);
 
     if (socket) {
       sendMessage(socket, {
         type: 'hero/move',
-        payload: state.hero.direction,
+        payload: state.hero.box.direction,
       });
     }
   }

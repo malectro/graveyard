@@ -5,6 +5,39 @@ import {Entity} from '../entity';
 export interface Box {
   position: p.Vector2;
   size: p.Vector2;
+
+  move(): void;
+}
+
+export interface PhysicsBox extends Box {
+  speed: number;
+  direction: p.Vector2;
+  velocity: p.Vector2;
+  futurePosition: p.Vector2;
+  lastUpdate: number;
+}
+
+export class Physics implements Box {
+  position: p.Vector2;
+  size: p.Vector2;
+
+  move() {};
+}
+
+export class DynamicPhysics implements PhysicsBox {
+  position: p.Vector2;
+  size: p.Vector2;
+  speed: number = 0;
+  direction: p.Vector2 = p.point();
+  velocity: p.Vector2 = p.point();
+  futurePosition: p.Vector2 = p.point();
+  lastUpdate: number = 0;
+
+  constructor(box: Partial<PhysicsBox>) {
+    return Object.assign(this, box);
+  }
+
+  move() {}
 }
 
 export function intersectSegment(box: Box, rayOrigin: p.Point, rayTerminus: p.Vector2): null | p.Point {

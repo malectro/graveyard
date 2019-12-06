@@ -60,11 +60,14 @@ async function main() {
 
   const world = new PIXI.Container();
 
+  const {hero} = state2;
   for (const entity of state2.entities.values()) {
-    console.log('adding', entity, entity.graphic.mesh);
-    world.addChild(entity.graphic.mesh);
+    if (entity !== hero) {
+      console.log('adding', entity, entity.graphic.mesh);
+      world.addChild(entity.graphic.mesh);
+    }
   }
-
+  app.stage.addChild(hero.graphic.mesh);
   app.stage.addChild(world);
 
   const greenShader = new PIXI.Shader(solidColorProgram, {
@@ -74,27 +77,19 @@ async function main() {
     uColor: [0.8, 0.5, 0.5],
   });
 
-  const {hero} = state2;
-
-  const heroMesh = new PIXI.Mesh(headstoneGeometry, pinkShader);
-  heroMesh.position.set(hero.x, hero.y);
-  app.stage.addChild(heroMesh);
-
-  view.setCameraPosition(hero);
-
-  //const headstoneMeshMap = new WeakMap();
-  const headstoneMap = new Map();
+  view.setCameraPosition(hero.graphic.mesh.position);
 
   app.ticker.add(_delta => {
     const now = Date.now();
     const {hero, entities} = state2;
 
     // TODO (kyle): only do any of this if the hero is moving
-    if (Hero.isMoving(hero)) {
-      Hero.move(hero, entities.values(), now);
+    console.log('velocity', hero.box.velocity.x, hero.box.velocity.y);
+    if (Hero.isMoving(hero.box)) {
+      Hero.move(hero.box, entities.values(), now);
     }
-    heroMesh.position.set(hero.x, hero.y);
-    view.focusCamera(hero);
+    hero.graphic.mesh.position.set(hero.box.position.x, hero.box.position.y);
+    view.focusCamera(hero.box.position);
 
       /*
     for (const [id, entity] of entities) {
@@ -113,18 +108,9 @@ async function main() {
   //const socket = ws.start('localhost:8030', state, view);
   //Controls.init(state, socket);
   Controls.init(state2);
-
-  const headstoneMeshPool = new Pool(
-    () => (
-      new PIXI.Mesh(headstoneGeometry, greenShader)
-    ),
-  );
 }
 
 main();
-
-/*
- */
 
 /*
 window.addEventListener('resize', () => {
