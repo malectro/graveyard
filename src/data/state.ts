@@ -1,9 +1,9 @@
 export default {
   hero: '3',
   entities: [
-    {id: '1', box: {position: {x: 200, y: 100}, size: {x: 100, y: 100}}, assetId: '1', speciesId: '1'},
-    {id: '2', box: {position: {x: 400, y: 100}, size: {x: 50, y: 50}}, assetId: '2', speciesId: '2'},
-    {id: '3', box: {position: {x: 0, y: 0}, size: {x: 100, y: 100}, speed: 0.5}, assetId: '3', speciesId: '3'},
+    {id: '1', box: {className: 'StaticPhysics', position: {x: 200, y: 100}, size: {x: 100, y: 100}}, assetId: '1', speciesId: '1'},
+    {id: '2', box: {className: 'StaticPhysics', position: {x: 400, y: 100}, size: {x: 50, y: 50}}, assetId: '2', speciesId: '2'},
+    {id: '3', box: {className: 'DynamicPhysics', position: {x: 0, y: 0}, size: {x: 100, y: 100}, speed: 0.5}, assetId: '3', speciesId: '3'},
   ],
   assets: [
     {id: '1', width: 100, height: 100, mesh: 0x0000ff},

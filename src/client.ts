@@ -83,13 +83,12 @@ async function main() {
     const now = Date.now();
     const {hero, entities} = state2;
 
-    // TODO (kyle): only do any of this if the hero is moving
-    console.log('velocity', hero.box.velocity.x, hero.box.velocity.y);
+    //console.log('velocity', hero.box.velocity.x, hero.box.velocity.y);
     if (Hero.isMoving(hero.box)) {
       Hero.move(hero.box, entities.values(), now);
+      hero.graphic.mesh.position.set(hero.box.position.x, hero.box.position.y);
+      view.focusCamera(hero.box.position);
     }
-    hero.graphic.mesh.position.set(hero.box.position.x, hero.box.position.y);
-    view.focusCamera(hero.box.position);
 
       /*
     for (const [id, entity] of entities) {

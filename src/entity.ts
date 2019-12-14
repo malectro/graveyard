@@ -1,12 +1,13 @@
 import * as PIXI from 'pixi.js';
 import {Vector2} from './utils/point';
-import {Box, PhysicsBox} from './utils/box';
+import {Physics, DynamicPhysics} from './utils/box';
+import ClassParser from './utils/class-parser';
 import Graphic from './graphic';
 
 export class Entity {
   constructor(
     public id: string,
-    public box: Box,
+    public box: Physics,
     public graphic: Graphic,
     public species: Species,
   ) {}
@@ -20,10 +21,10 @@ export class Entity {
     };
   }
 
-  static fromJSON(state, json: any): Entity {
+  static fromJSON(state, parser: ClassParser, json: any): Entity {
     const entity = new Entity(
       json.id,
-      json.box,
+      parser.parse(json.box),
       Graphic.fromJSON(state.assets.get(json.assetId)),
       state.species.get(json.speciesId),
     );
@@ -33,7 +34,7 @@ export class Entity {
 }
 
 export interface PhysicsEntity extends Entity {
-  box: PhysicsBox;
+  box: DynamicPhysics;
 }
 
 export interface Species {
