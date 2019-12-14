@@ -1,39 +1,20 @@
-//import './webgl.js';
-//import * as PIXI from 'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.8.7/pixi.min.js';
-//import * as PIXI from '../node_modules/pixi.js/dist/pixi.js';
 import * as PIXI from 'pixi.js';
-import {Observable} from 'rxjs';
-//import {Observable} from 'https://raw.githubusercontent.com/ReactiveX/rxjs/master/src/index.ts';
-
-import {scale, repeat} from './utils/array.js';
-import * as p from './utils/point.js';
 
 import stateJson from './data/state';
 import State from './state2';
 import {loadShaders} from './graphic';
-import {entities} from './entities';
-import createState from './state.js';
-import * as Hero from './hero.js';
-import * as Headstone from './headstone.js';
-import View from './view.js';
-import * as Controls from './controls.js';
-import * as ws from './websocket.js';
-import Pool from './utils/pool.js';
+import View from './view';
+import * as Controls from './controls';
+import * as ws from './websocket';
+import Pool from './utils/pool';
 
-const state = createState();
-
-//(<any>window).__state = state;
-
-state.sprites = new Map(entities.map(entity => [entity.id, entity]));
-
-async function main() {
+async function main(): Promise<void> {
   await loadShaders();
 
   const state2 = State.fromJSON(stateJson);
   console.log('state', state2);
 
   //(<any>window).__state2 = state2;
-  //const {hero, headstones, sprites} = state;
 
   const app = new PIXI.Application({
     width: window.innerWidth,
@@ -44,19 +25,6 @@ async function main() {
   document.body.appendChild(app.view);
 
   const view = new View(app, {cameraPaddingPercentage: 0.2});
-
-  const unitSquare = [-1, -1, 1, -1, 1, 1, -1, 1];
-
-  const headstoneGeometry = new PIXI.Geometry()
-    .addAttribute('aVertexPosition', scale(unitSquare, 50), 2)
-    .addIndex([0, 1, 2, 0, 3, 2]);
-
-  const [vert, frag] = await Promise.all([
-    fetch('shaders/2d.vert').then(response => response.text()),
-    fetch('shaders/solidColor.frag').then(response => response.text()),
-  ]);
-
-  const solidColorProgram = PIXI.Program.from(vert, frag);
 
   const world = new PIXI.Container();
 
@@ -70,25 +38,14 @@ async function main() {
   app.stage.addChild(hero.graphic.mesh);
   app.stage.addChild(world);
 
-  const greenShader = new PIXI.Shader(solidColorProgram, {
-    uColor: [0.5, 0.8, 0.5],
-  });
-  const pinkShader = new PIXI.Shader(solidColorProgram, {
-    uColor: [0.8, 0.5, 0.5],
-  });
-
   view.setCameraPosition(hero.graphic.mesh.position);
 
-  app.ticker.add(_delta => {
+  app.ticker.add(delta => {
     const now = Date.now();
-    const {hero, entities} = state2;
+    const {hero} = state2;
 
-    //console.log('velocity', hero.box.velocity.x, hero.box.velocity.y);
-    if (Hero.isMoving(hero.box)) {
-      Hero.move(hero.box, entities.values(), now);
-      hero.graphic.mesh.position.set(hero.box.position.x, hero.box.position.y);
-      view.focusCamera(hero.box.position);
-    }
+    hero.tick(state2, now, delta);
+    view.focusCamera(hero.box.position);
 
       /*
     for (const [id, entity] of entities) {

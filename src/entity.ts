@@ -1,8 +1,9 @@
 import * as PIXI from 'pixi.js';
 import {Vector2} from './utils/point';
-import {Physics, DynamicPhysics} from './utils/box';
+import {Physics, DynamicPhysics} from './physics';
 import ClassParser from './utils/class-parser';
 import Graphic from './graphic';
+import State from './state2';
 
 export class Entity {
   constructor(
@@ -30,6 +31,14 @@ export class Entity {
     );
     entity.graphic.setPosition(entity.box.position);
     return entity;
+  }
+
+  tick(state: State, now: number, delta: number) {
+    // TODO (kyle): maybe make physics handle this? dirty property?
+    if (this.box instanceof DynamicPhysics) {
+      this.box.tick(state, now, delta);
+      this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
+    }
   }
 }
 

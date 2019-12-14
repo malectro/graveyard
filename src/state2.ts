@@ -24,7 +24,6 @@ export default class State {
     );
 
     state.hero = (state.entities.get(json.hero) as PhysicsEntity);
-    state.hero.box = new DynamicPhysics(state.hero.box);
 
     return state;
   }

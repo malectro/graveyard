@@ -8,7 +8,7 @@ const {run} = Deno;
 
 async function main() {
   const server = run({
-    args: ['deno', 'run', '--allow-net', 'https://deno.land/std/http/file_server.ts'],
+    args: ['deno', 'run', '--allow-all', 'https://deno.land/std@v0.24.0/http/file_server.ts'],
     cwd: resolve(buildDir, 'client'),
   });
 
