@@ -13,6 +13,30 @@ export interface PhysicsBox extends Box {
   lastUpdate: number;
 }
 
+export function doBoxesIntersect(box1: Box, box2: Box): boolean {
+  return (
+    (
+      box1.position.x < box2.position.x + box2.size.x &&
+      box1.position.x + box1.size.x > box2.position.x
+    ) &&
+    (
+      box1.position.y < box2.position.y + box2.size.y &&
+      box1.position.y + box1.size.y > box2.position.y
+    )
+  );
+
+  return (
+    (box1.position.x > box2.position.x &&
+      box1.position.x < box2.position.x + box2.size.x &&
+      box1.position.y > box2.position.y &&
+      box1.position.y < box2.position.y + box2.size.y) ||
+    (box2.position.x > box1.position.x &&
+      box2.position.x < box1.position.x + box1.size.x &&
+      box2.position.y > box1.position.y &&
+      box2.position.y < box1.position.y + box1.size.y)
+  );
+}
+
 export function intersectSegment(
   box: Box,
   rayOrigin: p.Point,

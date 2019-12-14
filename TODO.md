@@ -1,7 +1,7 @@
-- [ ] Hero should be an Entity
-- [ ] allow viewing of epitaph when walking up to tombstone
+- [x] Hero should be an Entity
 - [x] allow certain sprites to block movement
-  - [ ] block bounding box of hero
+  - [x] block bounding box of hero
+- [ ] allow viewing of epitaph when walking up to tombstone
 - [ ] use es6 classes for sprites
 - [ ] add pixel art assets
 - [ ] create tombstone creation flow

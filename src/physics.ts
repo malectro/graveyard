@@ -1,6 +1,6 @@
 import {reduce} from './utils/iterable';
 import * as p from './utils/point';
-import {PhysicsBox, Box, intersectSegment} from './utils/box';
+import {PhysicsBox, Box, intersectSegment, doBoxesIntersect} from './utils/box';
 import {Entity} from './entity';
 import Component from './component';
 import State from './state2';
@@ -65,33 +65,38 @@ export class DynamicPhysics implements PhysicsBox, Physics {
     const duration = now - this.lastUpdate;
     const travelVector = p.scale({...this.velocity}, duration);
 
-    p.add(p.set(this.futurePosition, this.position), travelVector);
+    p.add(this.position, travelVector);
 
-    const intersection = reduce(
-      entities,
-      (info, entity) => {
-        const point = intersectSegment(
-          entity.box,
-          this.position,
-          this.futurePosition,
-        );
-        if (point) {
-          const distance = p.cheapDistance(this.position, point);
-          if (distance < info.d) {
-            info.d = distance;
-            info.p = point;
-          }
+    for (const entity of entities) {
+      if (entity.box !== this && doBoxesIntersect(this, entity.box)) {
+        const adjustment = p.point();
+
+        if (this.velocity.x > 0) {
+          adjustment.x = this.position.x + this.size.x - entity.box.position.x;
+        } else {
+          adjustment.x = this.position.x - (entity.box.position.x + entity.box.size.x);
         }
-        return info;
-      },
-      {d: Infinity, p: null},
-    );
+        if (this.velocity.y > 0) {
+          adjustment.y = this.position.y + this.size.y - entity.box.position.y;
+        } else {
+          adjustment.y = this.position.y - (entity.box.position.y + entity.box.size.y);
+        }
 
-    if (intersection.p) {
-      p.add(p.set(this.position, intersection.p), p.scale(travelVector, -0.1));
-    } else {
-      p.set(this.position, this.futurePosition);
+        if (this.velocity.x === 0) {
+          this.position.y -= adjustment.y;
+        } else if (this.velocity.y === 0) {
+          this.position.x -= adjustment.x;
+        } else {
+          adjustment.x = adjustment.x / this.velocity.x;
+          adjustment.y = adjustment.y / this.velocity.y;
+          const adjustmentValue = Math.min(adjustment.x, adjustment.y);
+          this.position.x -= this.velocity.x * adjustmentValue;
+          this.position.y -= this.velocity.y * adjustmentValue;
+        }
+      }
     }
+
+    //p.set(this.position, this.futurePosition);
 
     this.lastUpdate = now;
   }
