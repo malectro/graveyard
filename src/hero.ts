@@ -17,6 +17,17 @@ export class HeroSpecies implements Species {
   }
 }
 
+export class Hero {
+  constructor(public entity: PhysicsEntity) {}
+
+  activateTargetEntity() {
+    const lastHitEntity = this.entity.box.lastHitEntity;
+
+    if (lastHitEntity) {
+    }
+  }
+}
+
 export interface HeroType extends p.Point, Graphic {
   id: string;
   name: string;

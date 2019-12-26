@@ -13,6 +13,7 @@ export function point(x: number = 0, y: number = 0) {
   };
 }
 export const create = point;
+export const vector2 = point;
 
 export function copy(source: Point): Point {
   return point(source.x, source.y);

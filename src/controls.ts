@@ -4,11 +4,14 @@ import {Socket, sendMessage} from './websocket';
 import State from './state2';
 
 export function init(state: State, socket?: Socket) {
+  const controller = new ExplorationController(state);
+
   const keys = {
-    ArrowDown: {x: 0, y: 1},
-    ArrowUp: {x: 0, y: -1},
-    ArrowRight: {x: 1, y: 0},
-    ArrowLeft: {x: -1, y: 0},
+    ArrowDown: {method: 'direction', payload: 'down'},
+    ArrowUp: {method: 'direction', payload: 'up'},
+    ArrowLeft: {method: 'direction', payload: 'left'},
+    ArrowRight: {method: 'direction', payload: 'right'},
+    ' ': {method: 'activate'},
   };
 
   const currentKeys = new Set();
@@ -18,15 +21,14 @@ export function init(state: State, socket?: Socket) {
     (event: KeyboardEvent) => {
       const key = keys[event.key];
 
+      console.log('key', event.key);
+
       if (key) {
         event.preventDefault();
 
         if (!currentKeys.has(event.key)) {
           currentKeys.add(event.key);
-
-          PointMath.add(state.hero.box.direction, key);
-          state.hero.box.lastUpdate = Date.now();
-          resolveVelocity();
+          controller[key.method](true, key.payload);
         }
       }
     },
@@ -43,25 +45,68 @@ export function init(state: State, socket?: Socket) {
 
         if (currentKeys.has(event.key)) {
           currentKeys.delete(event.key);
-
-          PointMath.subtract(state.hero.box.direction, key);
-          resolveVelocity();
-          console.log('hero is at', state.hero.box.position.x, state.hero.box.position.y);
+          controller[key.method](false, key.payload);
         }
       }
     },
     {capture: true},
   );
+}
 
-  function resolveVelocity() {
-    //Hero.move(state.hero, state.sprites.values(), Date.now());
-    Hero.resolveVelocity(state.hero.box);
+class BrowserKeyboardControllerAdapter {
+  constructor(private keys: {[key: string]: string}, public controller: Controller) {
+    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keyup', this.handleKeyUp);
+  }
 
+  handleKeyDown = (event: KeyboardEvent) => {
+
+  };
+
+  handleKeyUp = (event: KeyboardEvent) => {
+    
+  };
+}
+
+interface Controller {
+  
+}
+
+class ExplorationController {
+  static directions = {
+    down: {x: 0, y: 1},
+    up: {x: 0, y: -1},
+    right: {x: 1, y: 0},
+    left: {x: -1, y: 0},
+  };
+
+  constructor(private state: State) {}
+
+  direction(buttonOn: boolean, direction) {
+    const vector = ExplorationController.directions[direction];
+    if (buttonOn) {
+      PointMath.add(this.state.hero.box.direction, vector);
+    } else {
+      PointMath.subtract(this.state.hero.box.direction, vector);
+    }
+    this.resolveVelocity();
+  }
+
+  activate(_buttonOn: boolean) {
+    this.state.hero.activateNearbyEntity(this.state);
+  }
+
+  resolveVelocity() {
+    this.state.hero.box.lastUpdate = Date.now();
+    Hero.resolveVelocity(this.state.hero.box);
+
+    /*
     if (socket) {
       sendMessage(socket, {
         type: 'hero/move',
         payload: state.hero.box.direction,
       });
     }
+    */
   }
 }

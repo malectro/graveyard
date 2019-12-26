@@ -13,6 +13,21 @@ export interface PhysicsBox extends Box {
   lastUpdate: number;
 }
 
+export function createBox(): Box {
+  return {
+    position: p.vector2(0, 0),
+    size: p.vector2(0, 0),
+  };
+}
+
+export function copy(box: Box): Box {
+  return {position: p.copy(box.position), size: p.copy(box.size)};
+}
+
+export function setOffset(box: Box, offset: p.Vector2): void {
+  p.add(box.position, offset);
+}
+
 export function doBoxesIntersect(box1: Box, box2: Box): boolean {
   return (
     (

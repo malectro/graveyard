@@ -31,6 +31,8 @@ export class DynamicPhysics implements PhysicsBox, Physics {
   velocity: p.Vector2 = p.point();
   futurePosition: p.Vector2 = p.point();
   lastUpdate = 0;
+  // TODO (kyle): possible memory leak
+  lastHitEntity: Entity | null = null;
 
   constructor(box: Partial<PhysicsBox>) {
     return Object.assign(this, box);
@@ -68,7 +70,9 @@ export class DynamicPhysics implements PhysicsBox, Physics {
     p.add(this.position, travelVector);
 
     for (const entity of entities) {
-      if (entity.box !== this && doBoxesIntersect(this, entity.box)) {
+      if (entity.box !== this && entity.species.collides && doBoxesIntersect(this, entity.box)) {
+        this.lastHitEntity = entity;
+
         const adjustment = p.point();
 
         if (this.velocity.x > 0) {

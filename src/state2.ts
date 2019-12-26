@@ -3,13 +3,16 @@ import {Asset} from './graphic';
 import {Entity, PhysicsEntity, Species} from './entity';
 import {DynamicPhysics, StaticPhysics} from './physics';
 import {HeroSpecies} from './hero';
-import ClassParser from './utils/class-parser';
+import ClassParser, {Parser} from './utils/class-parser';
+import {Trigger} from './trigger';
+import {IdMap} from './utils/id-map';
 
 export default class State {
   hero: PhysicsEntity;
   entities: IdMap<Entity>;
   assets: IdMap<Asset>;
   species: IdMap<Species>;
+  triggers: IdMap<Trigger>;
 
   static fromJSON(json): State {
     const classParser = new ClassParser([StaticPhysics, DynamicPhysics]);
@@ -17,6 +20,9 @@ export default class State {
     const state = Object.assign(new State(), {
       assets: IdMap.fromJSON(json.assets),
       species: IdMap.fromJSON(json.species),
+      triggers: IdMap.fromJSON(
+        json.triggers.map(trigger => Trigger.fromJSON(trigger)),
+      ),
     });
 
     state.entities = IdMap.fromJSON(
@@ -26,19 +32,5 @@ export default class State {
     state.hero = (state.entities.get(json.hero) as PhysicsEntity);
 
     return state;
-  }
-}
-
-interface Identified {
-  id: string;
-}
-
-class IdMap<T extends Identified> extends Map<string, T> {
-  static fromJSON<T extends Identified>(json: T[]): IdMap<T> {
-    return new IdMap(json.map(thing => [thing.id, thing]));
-  }
-
-  toJSON(): T[] {
-    return Array.from(this.values());
   }
 }
