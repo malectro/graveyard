@@ -7,7 +7,7 @@ export default {
   ],
   assets: [
     {id: '1', width: 100, height: 100, mesh: 0x0000ff},
-    {id: '2', width: 50, height: 50, mesh: 0x00ff00},
+    {id: '2', width: 50, height: 50, mesh: 'grass-1.png'},
     {id: '3', width: 100, height: 100, mesh: 0xff0000},
   ],
   species: [

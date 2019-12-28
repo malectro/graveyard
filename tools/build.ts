@@ -1,7 +1,7 @@
 #!/usr/bin/env deno run --allow-all
 
-import {emptyDir, ensureDir, walk} from 'https://deno.land/std/fs/mod.ts';
-import {dirname, resolve} from 'https://deno.land/std/path/mod.ts';
+import {emptyDir, ensureDir, walk} from 'https://deno.land/std@v0.27.0/fs/mod.ts';
+import {dirname, resolve} from 'https://deno.land/std@v0.27.0/path/mod.ts';
 
 import {projectRoot} from './common.ts';
 
@@ -90,6 +90,7 @@ async function main() {
 
   await process.status();
 
+  /*
   await run({
     args: [
       'node_modules/.bin/tsc',
@@ -98,9 +99,8 @@ async function main() {
     ],
     cwd: projectRoot,
   }).status();
+  */
 }
-
-main();
 
 async function moveFile(filename) {
   const decoder = new TextDecoder();
@@ -128,3 +128,5 @@ async function copyToBuild(filename) {
 function getBuildFilename(filename) {
   return resolve(buildDir, filename.replace(srcDir + '/', ''));
 }
+
+main();

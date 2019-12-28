@@ -5,20 +5,43 @@ import Cache from './utils/cache';
 import {scale} from './utils/array';
 
 export default class Graphic {
-  mesh: PIXI.Mesh;
+  mesh: PIXI.Container;
   asset: Asset;
 
   static fromJSON(json: Asset): Graphic {
     const graphic = new Graphic();
     graphic.asset = json;
-    graphic.mesh = meshPool.request();
-    graphic.mesh.shader = shaderCache.get(json.mesh);
+
+    const reference = json.mesh;
+
+    if (typeof reference === 'number') {
+      const mesh = meshPool.request();
+      mesh.shader = shaderCache.get(json.mesh);
+      graphic.mesh = mesh;
+
+    } else {
+      const texture = PIXI.Texture.from(`/assets/${reference}`, {
+        alphaMode: PIXI.ALPHA_MODES.UNPACK,
+      });
+      const sprite = PIXI.Sprite.from(texture);
+      graphic.mesh = sprite;
+    }
+
     return graphic;
   }
 
   toJSON() {
+    const {mesh} = this;
+    let reference;
+
+    if (mesh instanceof PIXI.Mesh) {
+      reference = PIXI.utils.rgb2hex(mesh.shader.uniforms.uColor);
+    } else if (mesh instanceof PIXI.Sprite) {
+      reference = mesh.name;
+    }
+
     return {
-      color: PIXI.utils.rgb2hex(this.mesh.shader.uniforms.uColor),
+      mesh: reference,
     };
   }
 
@@ -29,7 +52,7 @@ export default class Graphic {
 
 export interface Asset {
   id: string;
-  mesh: number;
+  mesh: number | string;
 }
 
 const meshPool = new Pool(

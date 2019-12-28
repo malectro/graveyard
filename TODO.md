@@ -1,13 +1,16 @@
-- [x] Hero should be an Entity
-- [x] allow certain sprites to block movement
-  - [x] block bounding box of hero
+## todo
+- [ ] add pixel art assets
 - [ ] allow viewing of epitaph when walking up to tombstone
   - [x] target hit box on tombstones?
     - [x] entity component that determines activation?
     - [ ] child entities?
   - [ ] some sort of modal
   - [ ] print tombstone data
-- [ ] use es6 classes for sprites
-- [ ] add pixel art assets
+- [ ] entities need layering or z-index
 - [ ] create tombstone creation flow
-- [ ] Sprites should have a position (not BE a position).
+- [ ] spritesheet?
+
+## done
+- [x] Hero should be an Entity
+- [x] allow certain sprites to block movement
+  - [x] block bounding box of hero

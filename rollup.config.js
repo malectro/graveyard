@@ -6,7 +6,7 @@ import typescript from 'rollup-plugin-typescript';
 export default {
   input: 'src/client.ts',
   output: {
-    file: 'build/client/client.js',
+    file: 'build/client.js',
     format: 'umd',
     globals: {
       "pixi.js": "PIXI",
