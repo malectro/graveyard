@@ -1,5 +1,9 @@
 ## todo
 - [ ] add pixel art assets
+  - [ ] animate the hero
+  - [ ] add all up/down animations
+  - [ ] add all diagonal animations
+- [ ] add acceleration and friction
 - [ ] allow viewing of epitaph when walking up to tombstone
   - [x] target hit box on tombstones?
     - [x] entity component that determines activation?
