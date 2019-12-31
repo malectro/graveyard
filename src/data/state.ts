@@ -1,13 +1,13 @@
 export default {
   hero: '3',
   entities: [
-    {id: '1', box: {className: 'StaticPhysics', position: {x: 200, y: 100}, size: {x: 100, y: 100}}, assetId: '1', speciesId: '1', triggerId: '1'},
-    {id: '2', box: {className: 'StaticPhysics', position: {x: 400, y: 100}, size: {x: 50, y: 50}}, assetId: '2', speciesId: '2'},
+    {id: '1', box: {className: 'StaticPhysics', position: {x: 200, y: 100}, size: {x: 128, y: 128}}, assetId: '1', speciesId: '1', triggerId: '1'},
+    {id: '2', box: {className: 'StaticPhysics', position: {x: 400, y: 100}, size: {x: 64, y: 64}}, assetId: '2', speciesId: '2'},
     {id: '3', box: {className: 'DynamicPhysics', position: {x: 0, y: 0}, size: {x: 100, y: 100}, speed: 0.5}, assetId: '3', speciesId: '3'},
   ],
   assets: [
-    {id: '1', width: 100, height: 100, mesh: 0x0000ff},
-    {id: '2', width: 50, height: 50, mesh: 'grass-1.png'},
+    {id: '1', width: 128, height: 128, mesh: 'zelda-headstone.png'},
+    {id: '2', width: 64, height: 64, mesh: 'grass-1.png'},
     {id: '3', width: 100, height: 100, mesh: 0xff0000},
   ],
   species: [
@@ -16,7 +16,7 @@ export default {
     {id: '3', type: 'hero', collides: true, name: 'Dude'},
   ],
   triggers: [
-    {id: '1', box: {position: {x: 0, y: 100}, size: {x: 100, y: 50}}},
+    {id: '1', box: {position: {x: 0, y: 128}, size: {x: 128, y: 50}}},
   ],
 };
 

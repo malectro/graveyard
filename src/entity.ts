@@ -39,7 +39,7 @@ export class Entity {
       state.species.get(json.speciesId),
       json.triggerId && state.triggers.get(json.triggerId),
     );
-    entity.graphic.setPosition(entity.box.position);
+    entity.graphic.mesh.position.set(entity.box.position.x, entity.box.position.y);
     return entity;
   }
 
@@ -47,7 +47,7 @@ export class Entity {
     // TODO (kyle): maybe make physics handle this? dirty property?
     if (this.box instanceof DynamicPhysics) {
       this.box.tick(state, now, delta);
-      this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
+      this.graphic.mesh.position.set(this.box.position.x + this.box.halfSize.x, this.box.position.y + this.box.halfSize.y);
     }
   }
 

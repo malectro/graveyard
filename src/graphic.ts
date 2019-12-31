@@ -22,15 +22,19 @@ export default class Graphic {
     } else {
       const texture = PIXI.Texture.from(`/assets/${reference}`, {
         alphaMode: PIXI.ALPHA_MODES.UNPACK,
+        scaleMode: PIXI.SCALE_MODES.NEAREST,
       });
-      const sprite = PIXI.Sprite.from(texture);
+      const sprite = new PIXI.Sprite(texture);
       graphic.mesh = sprite;
     }
+
+    graphic.mesh.width = json.width;
+    graphic.mesh.height = json.height;
 
     return graphic;
   }
 
-  toJSON() {
+  toJSON(): any {
     const {mesh} = this;
     let reference;
 
@@ -45,7 +49,7 @@ export default class Graphic {
     };
   }
 
-  setPosition(position: Vector2) {
+  setPosition(position: Vector2): void {
     this.mesh.position.set(position.x, position.y);
   }
 }
@@ -53,6 +57,8 @@ export default class Graphic {
 export interface Asset {
   id: string;
   mesh: number | string;
+  width: number;
+  height: number;
 }
 
 const meshPool = new Pool(

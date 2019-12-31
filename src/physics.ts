@@ -10,11 +10,13 @@ export interface Physics extends Component, Box {}
 export class StaticPhysics implements Physics {
   position: p.Vector2;
   size: p.Vector2;
+  halfSize: p.Vector2;
 
   static fromJSON(json: any): StaticPhysics {
     const physics = new this();
     physics.position = json.position;
     physics.size = json.size;
+    physics.halfSize = p.scale(p.copy(json.size), 0.5);
     return physics;
   }
 
@@ -26,6 +28,7 @@ export class StaticPhysics implements Physics {
 export class DynamicPhysics implements PhysicsBox, Physics {
   position: p.Vector2;
   size: p.Vector2;
+  halfSize: p.Vector2;
   speed = 0;
   direction: p.Vector2 = p.point();
   velocity: p.Vector2 = p.point();
@@ -35,7 +38,8 @@ export class DynamicPhysics implements PhysicsBox, Physics {
   lastHitEntity: Entity | null = null;
 
   constructor(box: Partial<PhysicsBox>) {
-    return Object.assign(this, box);
+    Object.assign(this, box);
+    this.halfSize = p.scale(p.copy(this.size), 0.5);
   }
 
   static fromJSON(json: any): DynamicPhysics {
