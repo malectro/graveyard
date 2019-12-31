@@ -35,8 +35,8 @@ async function main(): Promise<void> {
       world.addChild(entity.graphic.mesh);
     }
   }
-  app.stage.addChild(hero.graphic.mesh);
   app.stage.addChild(world);
+  app.stage.addChild(hero.graphic.mesh);
 
   view.setCameraPosition(hero.graphic.mesh.position);
 

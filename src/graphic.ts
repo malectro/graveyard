@@ -23,6 +23,8 @@ export default class Graphic {
       const texture = PIXI.Texture.from(`/assets/${reference}`, {
         alphaMode: PIXI.ALPHA_MODES.UNPACK,
         scaleMode: PIXI.SCALE_MODES.NEAREST,
+        // TODO
+        //roundPixels: true,
       });
       const sprite = new PIXI.Sprite(texture);
       graphic.mesh = sprite;
