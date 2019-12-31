@@ -47,7 +47,8 @@ export class Entity {
     // TODO (kyle): maybe make physics handle this? dirty property?
     if (this.box instanceof DynamicPhysics) {
       this.box.tick(state, now, delta);
-      this.graphic.mesh.position.set(this.box.position.x + this.box.halfSize.x, this.box.position.y + this.box.halfSize.y);
+      this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
+      //this.graphic.mesh.position.set(this.box.position.x + this.box.halfSize.x, this.box.position.y + this.box.halfSize.y);
     }
   }
 
