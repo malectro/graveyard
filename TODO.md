@@ -3,6 +3,7 @@
   - [ ] animate the hero
   - [ ] add all up/down animations
   - [ ] add all diagonal animations
+- [ ] textures should be shared
 - [ ] add acceleration and friction
 - [ ] allow viewing of epitaph when walking up to tombstone
   - [x] target hit box on tombstones?

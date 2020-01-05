@@ -31,11 +31,14 @@ export class Entity {
     };
   }
 
-  static fromJSON(state, parser: ClassParser<Physics>, json: any): Entity {
+  static fromJSON(state, parsers: {
+    physics: ClassParser<Physics>;
+    graphic: ClassParser<Graphic>;
+  }, json: any): Entity {
     const entity = new Entity(
       json.id,
-      parser.parse(json.box),
-      Graphic.fromJSON(state.assets.get(json.assetId)),
+      parsers.physics.parse(json.box),
+      parsers.graphic.parse(state.assets.get(json.assetId)),
       state.species.get(json.speciesId),
       json.triggerId && state.triggers.get(json.triggerId),
     );

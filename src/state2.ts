@@ -2,6 +2,7 @@ import * as Hero from './hero.js';
 import {Asset} from './graphic';
 import {Entity, PhysicsEntity, Species} from './entity';
 import {DynamicPhysics, StaticPhysics} from './physics';
+import {AnimatedGraphic, StaticGraphic} from './graphic';
 import {HeroSpecies} from './hero';
 import ClassParser, {Parser} from './utils/class-parser';
 import {Trigger} from './trigger';
@@ -15,7 +16,8 @@ export default class State {
   triggers: IdMap<Trigger>;
 
   static fromJSON(json): State {
-    const classParser = new ClassParser([StaticPhysics, DynamicPhysics]);
+    const physicsClassParser = new ClassParser([StaticPhysics, DynamicPhysics]);
+    const graphicClassParser = new ClassParser([AnimatedGraphic, StaticGraphic]);
 
     const state = Object.assign(new State(), {
       assets: IdMap.fromJSON(json.assets),
@@ -26,7 +28,7 @@ export default class State {
     });
 
     state.entities = IdMap.fromJSON(
-      json.entities.map(entity => Entity.fromJSON(state, classParser, entity)),
+      json.entities.map(entity => Entity.fromJSON(state, {physics: physicsClassParser, graphic: graphicClassParser}, entity)),
     );
 
     state.hero = (state.entities.get(json.hero) as PhysicsEntity);

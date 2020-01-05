@@ -4,44 +4,36 @@ import Pool from './utils/pool';
 import Cache from './utils/cache';
 import {scale} from './utils/array';
 
-export default class Graphic {
+export interface Graphic {
+  id: string;
+  mesh: PIXI.Container;
+}
+
+export class StaticGraphic implements Graphic {
   id: string;
   mesh: PIXI.Container;
   asset: Asset;
 
-  static fromJSON(json: Asset): Graphic {
-    const graphic = new Graphic();
+  static fromJSON(json: Asset): StaticGraphic {
+    const graphic = new StaticGraphic();
     graphic.asset = json;
     graphic.id = json.id;
 
-    if (json.type === 'animated') {
-      const textures = json.src.map(src =>
-        PIXI.Texture.from(`/assets/${src}`, {
-          alphaMode: PIXI.ALPHA_MODES.UNPACK,
-          scaleMode: PIXI.SCALE_MODES.NEAREST,
-        }),
-      );
-      const sprite = new PIXI.AnimatedSprite(textures);
-      sprite.animationSpeed = 0.1;
-      sprite.play();
-      graphic.mesh = sprite;
-    } else {
-      const reference = json.src;
+    const reference = json.src;
 
-      if (typeof reference === 'number') {
-        const mesh = meshPool.request();
-        mesh.shader = shaderCache.get(reference);
-        graphic.mesh = mesh;
-      } else {
-        const texture = PIXI.Texture.from(`/assets/${reference}`, {
-          alphaMode: PIXI.ALPHA_MODES.UNPACK,
-          scaleMode: PIXI.SCALE_MODES.NEAREST,
-          // TODO
-          //roundPixels: true,
-        });
-        const sprite = new PIXI.Sprite(texture);
-        graphic.mesh = sprite;
-      }
+    if (typeof reference === 'number') {
+      const mesh = meshPool.request();
+      mesh.shader = shaderCache.get(reference);
+      graphic.mesh = mesh;
+    } else {
+      const texture = PIXI.Texture.from(`/assets/${reference}`, {
+        alphaMode: PIXI.ALPHA_MODES.UNPACK,
+        scaleMode: PIXI.SCALE_MODES.NEAREST,
+        // TODO
+        //roundPixels: true,
+      });
+      const sprite = new PIXI.Sprite(texture);
+      graphic.mesh = sprite;
     }
 
     graphic.mesh.width = json.width;
@@ -67,6 +59,42 @@ export default class Graphic {
       width: this.mesh.width,
       height: this.mesh.height,
     };
+  }
+
+  setPosition(position: Vector2): void {
+    this.mesh.position.set(position.x, position.y);
+  }
+}
+
+export class AnimatedGraphic implements Graphic {
+  id: string;
+  mesh: PIXI.AnimatedSprite;
+  asset: Asset;
+
+  static fromJSON(json: Asset): AnimatedGraphic {
+    const graphic = new AnimatedGraphic();
+    graphic.asset = json;
+    graphic.id = json.id;
+
+    const textures = json.src.map(src =>
+      PIXI.Texture.from(`/assets/${src}`, {
+        alphaMode: PIXI.ALPHA_MODES.UNPACK,
+        scaleMode: PIXI.SCALE_MODES.NEAREST,
+      }),
+    );
+    const sprite = new PIXI.AnimatedSprite(textures);
+    sprite.animationSpeed = 0.1;
+    sprite.play();
+    graphic.mesh = sprite;
+
+    graphic.mesh.width = json.width;
+    graphic.mesh.height = json.height;
+
+    return graphic;
+  }
+
+  toJSON(): Asset {
+    return this.asset;
   }
 
   setPosition(position: Vector2): void {
