@@ -1,6 +1,6 @@
 ## todo
 - [ ] add pixel art assets
-  - [ ] animate the hero
+  - [x] animate the hero
   - [ ] add all up/down animations
   - [ ] add all diagonal animations
 - [ ] textures should be shared

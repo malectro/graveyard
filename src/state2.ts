@@ -15,9 +15,19 @@ export default class State {
   species: IdMap<Species>;
   triggers: IdMap<Trigger>;
 
-  static fromJSON(json): State {
+  static async fromJSON(json): Promise<State> {
     const physicsClassParser = new ClassParser([StaticPhysics, DynamicPhysics]);
     const graphicClassParser = new ClassParser([AnimatedGraphic, StaticGraphic]);
+
+    const images = await Promise.all(
+      json.assets.map(
+        asset => Array.isArray(asset.src) ? Promise.all(asset.src.map(loadImage)) : loadImage(asset.src),
+      ),
+    ).catch(error => {
+      console.error(error);
+    });
+
+    console.log('het', images);
 
     const state = Object.assign(new State(), {
       assets: IdMap.fromJSON(json.assets),
@@ -35,4 +45,15 @@ export default class State {
 
     return state;
   }
+}
+
+function loadImage(src: string): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', reject);
+
+    image.src = `/assets/${src}`;
+  });
 }

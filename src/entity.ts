@@ -3,7 +3,7 @@ import {Vector2} from './utils/point';
 import {doBoxesIntersect} from './utils/box';
 import {Physics, DynamicPhysics} from './physics';
 import ClassParser from './utils/class-parser';
-import Graphic from './graphic';
+import {Graphic} from './graphic';
 import State from './state2';
 import {Trigger} from './trigger';
 
@@ -50,7 +50,8 @@ export class Entity {
     // TODO (kyle): maybe make physics handle this? dirty property?
     if (this.box instanceof DynamicPhysics) {
       this.box.tick(state, now, delta);
-      this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
+      this.graphic.update(this.box);
+      //this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
       //this.graphic.mesh.position.set(this.box.position.x + this.box.halfSize.x, this.box.position.y + this.box.halfSize.y);
     }
   }

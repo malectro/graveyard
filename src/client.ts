@@ -11,7 +11,7 @@ import Pool from './utils/pool';
 async function main(): Promise<void> {
   await loadShaders();
 
-  const state2 = (window as any).state = State.fromJSON(stateJson);
+  const state2 = (window as any).state = await State.fromJSON(stateJson);
   console.log('state', state2);
 
   //(<any>window).__state2 = state2;

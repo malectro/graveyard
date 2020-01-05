@@ -3,10 +3,12 @@ import {Vector2} from './utils/point';
 import Pool from './utils/pool';
 import Cache from './utils/cache';
 import {scale} from './utils/array';
+import {Physics} from './physics';
 
 export interface Graphic {
   id: string;
   mesh: PIXI.Container;
+  update(physics: Physics): void;
 }
 
 export class StaticGraphic implements Graphic {
@@ -29,6 +31,8 @@ export class StaticGraphic implements Graphic {
       const texture = PIXI.Texture.from(`/assets/${reference}`, {
         alphaMode: PIXI.ALPHA_MODES.UNPACK,
         scaleMode: PIXI.SCALE_MODES.NEAREST,
+        //width: json.sourceSize.width,
+        //height: json.sourceSize.height,
         // TODO
         //roundPixels: true,
       });
@@ -36,8 +40,10 @@ export class StaticGraphic implements Graphic {
       graphic.mesh = sprite;
     }
 
-    graphic.mesh.width = json.width;
-    graphic.mesh.height = json.height;
+    graphic.mesh.width = json.size.width;
+    graphic.mesh.height = json.size.height;
+
+    console.log('hioooo', json);
 
     return graphic;
   }
@@ -53,16 +59,15 @@ export class StaticGraphic implements Graphic {
     }
 
     return {
+      ...this.asset,
       id: this.id,
       type: this.asset.type,
       src: reference,
-      width: this.mesh.width,
-      height: this.mesh.height,
     };
   }
 
-  setPosition(position: Vector2): void {
-    this.mesh.position.set(position.x, position.y);
+  update(physics: Physics): void {
+    this.mesh.position.set(physics.position.x, physics.position.y);
   }
 }
 
@@ -70,25 +75,25 @@ export class AnimatedGraphic implements Graphic {
   id: string;
   mesh: PIXI.AnimatedSprite;
   asset: Asset;
+  state = 'stand';
+  states = {};
 
   static fromJSON(json: Asset): AnimatedGraphic {
     const graphic = new AnimatedGraphic();
     graphic.asset = json;
     graphic.id = json.id;
 
-    const textures = json.src.map(src =>
-      PIXI.Texture.from(`/assets/${src}`, {
-        alphaMode: PIXI.ALPHA_MODES.UNPACK,
-        scaleMode: PIXI.SCALE_MODES.NEAREST,
-      }),
-    );
-    const sprite = new PIXI.AnimatedSprite(textures);
-    sprite.animationSpeed = 0.1;
+    for (const [state, src] of Object.entries(json.src)) {
+      graphic.states[state] = src.map(createTexture);
+    }
+
+    const sprite = new PIXI.AnimatedSprite(graphic.states['stand']);
+    sprite.animationSpeed = 0.2;
     sprite.play();
     graphic.mesh = sprite;
 
-    graphic.mesh.width = json.width;
-    graphic.mesh.height = json.height;
+    graphic.mesh.width = json.size.width;
+    graphic.mesh.height = json.size.height;
 
     return graphic;
   }
@@ -97,8 +102,22 @@ export class AnimatedGraphic implements Graphic {
     return this.asset;
   }
 
-  setPosition(position: Vector2): void {
-    this.mesh.position.set(position.x, position.y);
+  update(physics: Physics): void {
+    this.mesh.position.set(physics.position.x, physics.position.y);
+    
+    if (this.state === 'stand') {
+      if (Math.abs(physics.velocity.x) > 0 || Math.abs(physics.velocity.y) > 0) {
+        this.state = 'walk';
+        this.mesh.textures = this.states[this.state];
+        this.mesh.gotoAndPlay(0);
+      }
+    } else if (this.state === 'walk') {
+      if (physics.velocity.x === 0 && physics.velocity.y === 0) {
+        this.state = 'stand';
+        this.mesh.textures = this.states[this.state];
+        this.mesh.gotoAndPlay(0);
+      }
+    }
   }
 }
 
@@ -106,8 +125,23 @@ export interface Asset {
   id: string;
   type: 'static' | 'animated';
   src: number | string;
-  width: number;
-  height: number;
+  sourceSize: {
+    width: number;
+    height: number;
+  };
+  size: {
+    width: number;
+    height: number;
+  };
+}
+
+function createTexture(src: string) {
+      return PIXI.Texture.from(`/assets/${src}`, {
+        alphaMode: PIXI.ALPHA_MODES.UNPACK,
+        scaleMode: PIXI.SCALE_MODES.NEAREST,
+        //width: json.sourceSize.width,
+        //height: json.sourceSize.height,
+      });
 }
 
 const meshPool = new Pool(() => new PIXI.Mesh(defaultGeometry, defaultShader));
