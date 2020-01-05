@@ -5,29 +5,43 @@ import Cache from './utils/cache';
 import {scale} from './utils/array';
 
 export default class Graphic {
+  id: string;
   mesh: PIXI.Container;
   asset: Asset;
 
   static fromJSON(json: Asset): Graphic {
     const graphic = new Graphic();
     graphic.asset = json;
+    graphic.id = json.id;
 
-    const reference = json.mesh;
-
-    if (typeof reference === 'number') {
-      const mesh = meshPool.request();
-      mesh.shader = shaderCache.get(json.mesh);
-      graphic.mesh = mesh;
-
-    } else {
-      const texture = PIXI.Texture.from(`/assets/${reference}`, {
-        alphaMode: PIXI.ALPHA_MODES.UNPACK,
-        scaleMode: PIXI.SCALE_MODES.NEAREST,
-        // TODO
-        //roundPixels: true,
-      });
-      const sprite = new PIXI.Sprite(texture);
+    if (json.type === 'animated') {
+      const textures = json.src.map(src =>
+        PIXI.Texture.from(`/assets/${src}`, {
+          alphaMode: PIXI.ALPHA_MODES.UNPACK,
+          scaleMode: PIXI.SCALE_MODES.NEAREST,
+        }),
+      );
+      const sprite = new PIXI.AnimatedSprite(textures);
+      sprite.animationSpeed = 0.1;
+      sprite.play();
       graphic.mesh = sprite;
+    } else {
+      const reference = json.src;
+
+      if (typeof reference === 'number') {
+        const mesh = meshPool.request();
+        mesh.shader = shaderCache.get(reference);
+        graphic.mesh = mesh;
+      } else {
+        const texture = PIXI.Texture.from(`/assets/${reference}`, {
+          alphaMode: PIXI.ALPHA_MODES.UNPACK,
+          scaleMode: PIXI.SCALE_MODES.NEAREST,
+          // TODO
+          //roundPixels: true,
+        });
+        const sprite = new PIXI.Sprite(texture);
+        graphic.mesh = sprite;
+      }
     }
 
     graphic.mesh.width = json.width;
@@ -36,7 +50,7 @@ export default class Graphic {
     return graphic;
   }
 
-  toJSON(): any {
+  toJSON(): Asset {
     const {mesh} = this;
     let reference;
 
@@ -47,7 +61,11 @@ export default class Graphic {
     }
 
     return {
-      mesh: reference,
+      id: this.id,
+      type: this.asset.type,
+      src: reference,
+      width: this.mesh.width,
+      height: this.mesh.height,
     };
   }
 
@@ -58,14 +76,13 @@ export default class Graphic {
 
 export interface Asset {
   id: string;
-  mesh: number | string;
+  type: 'static' | 'animated';
+  src: number | string;
   width: number;
   height: number;
 }
 
-const meshPool = new Pool(
-  () => new PIXI.Mesh(defaultGeometry, defaultShader),
-);
+const meshPool = new Pool(() => new PIXI.Mesh(defaultGeometry, defaultShader));
 
 const unitSquare = [-1, -1, 1, -1, 1, 1, -1, 1];
 
@@ -73,13 +90,12 @@ const defaultGeometry = new PIXI.Geometry()
   .addAttribute('aVertexPosition', scale(unitSquare, 50), 2)
   .addIndex([0, 1, 2, 0, 3, 2]);
 
-const shaderCache = new Cache(
-  (color: number) => { 
-    console.log('creating shader', PIXI.utils.hex2rgb(color), color);
-    return new PIXI.Shader(solidColorProgram, {
+const shaderCache = new Cache((color: number) => {
+  console.log('creating shader', PIXI.utils.hex2rgb(color), color);
+  return new PIXI.Shader(solidColorProgram, {
     uColor: PIXI.utils.hex2rgb(color),
-  }); },
-);
+  });
+});
 
 let defaultShader;
 let solidColorProgram;

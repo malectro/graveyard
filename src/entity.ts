@@ -43,7 +43,7 @@ export class Entity {
     return entity;
   }
 
-  tick(state: State, now: number, delta: number) {
+  tick(state: State, now: number, delta: number): void {
     // TODO (kyle): maybe make physics handle this? dirty property?
     if (this.box instanceof DynamicPhysics) {
       this.box.tick(state, now, delta);
@@ -52,7 +52,7 @@ export class Entity {
     }
   }
 
-  activateNearbyEntity(state: State) {
+  activateNearbyEntity(state: State): void {
     for (const entity of state.entities.values()) {
       if (entity !== this && entity.trigger && entity.trigger.canActivate(this)) {
         entity.trigger.activate();
