@@ -83,11 +83,15 @@ export class AnimatedGraphic implements Graphic {
     graphic.asset = json;
     graphic.id = json.id;
 
-    for (const [state, src] of Object.entries(json.src)) {
-      graphic.states[state] = src.map(createTexture);
+    for (const [direction, spriteSet] of Object.entries(json.src)) {
+      graphic.states[direction] = {};
+      for (const [state, src] of Object.entries(spriteSet)) {
+        graphic.states[direction][state] = src.map(createTexture);
+      }
     }
 
-    const sprite = new PIXI.AnimatedSprite(graphic.states['stand']);
+    console.log('hoa', graphic);
+    const sprite = new PIXI.AnimatedSprite(graphic.states['down']['stand']);
     sprite.animationSpeed = 0.2;
     sprite.play();
     graphic.mesh = sprite;
@@ -104,17 +108,28 @@ export class AnimatedGraphic implements Graphic {
 
   update(physics: Physics): void {
     this.mesh.position.set(physics.position.x, physics.position.y);
+
+    let direction;
+    if (physics.direction.x === 1) {
+      direction = 'right';
+    } else if (physics.direction.x === -1) {
+      direction = 'left';
+    } else if (physics.direction.y === -1) {
+      direction = 'up';
+    } else {
+      direction = 'down';
+    }
     
     if (this.state === 'stand') {
       if (Math.abs(physics.velocity.x) > 0 || Math.abs(physics.velocity.y) > 0) {
         this.state = 'walk';
-        this.mesh.textures = this.states[this.state];
+        this.mesh.textures = this.states[direction][this.state];
         this.mesh.gotoAndPlay(0);
       }
     } else if (this.state === 'walk') {
       if (physics.velocity.x === 0 && physics.velocity.y === 0) {
         this.state = 'stand';
-        this.mesh.textures = this.states[this.state];
+        this.mesh.textures = this.states[direction][this.state];
         this.mesh.gotoAndPlay(0);
       }
     }
