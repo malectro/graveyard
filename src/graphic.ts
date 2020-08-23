@@ -76,6 +76,7 @@ export class AnimatedGraphic implements Graphic {
   mesh: PIXI.AnimatedSprite;
   asset: Asset;
   state = 'stand';
+  direction = 'down';
   states = {};
 
   static fromJSON(json: Asset): AnimatedGraphic {
@@ -110,28 +111,30 @@ export class AnimatedGraphic implements Graphic {
     this.mesh.position.set(physics.position.x, physics.position.y);
 
     let direction;
-    if (physics.direction.x === 1) {
+    if (physics.facing.x > 0) {
       direction = 'right';
-    } else if (physics.direction.x === -1) {
+    } else if (physics.facing.x < 0) {
       direction = 'left';
-    } else if (physics.direction.y === -1) {
+    } else if (physics.facing.y < 0) {
       direction = 'up';
     } else {
       direction = 'down';
     }
     
-    if (this.state === 'stand') {
-      if (Math.abs(physics.velocity.x) > 0 || Math.abs(physics.velocity.y) > 0) {
-        this.state = 'walk';
-        this.mesh.textures = this.states[direction][this.state];
-        this.mesh.gotoAndPlay(0);
-      }
-    } else if (this.state === 'walk') {
+
+    let state;
+
       if (physics.velocity.x === 0 && physics.velocity.y === 0) {
-        this.state = 'stand';
-        this.mesh.textures = this.states[direction][this.state];
-        this.mesh.gotoAndPlay(0);
+        state = 'stand';
+      } else {
+        state = 'walk';
       }
+
+    if (state !== this.state || this.direction !== direction) {
+      this.mesh.textures = this.states[direction][state];
+      this.mesh.gotoAndPlay(0);
+      this.direction = direction;
+      this.state = state;
     }
   }
 }

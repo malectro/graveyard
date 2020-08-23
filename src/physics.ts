@@ -30,6 +30,7 @@ export class DynamicPhysics implements PhysicsBox, Physics {
   size: p.Vector2;
   halfSize: p.Vector2;
   speed = 0;
+  facing: p.Vector2 = p.point();
   direction: p.Vector2 = p.point();
   velocity: p.Vector2 = p.point();
   futurePosition: p.Vector2 = p.point();
@@ -102,6 +103,10 @@ export class DynamicPhysics implements PhysicsBox, Physics {
           this.position.y -= this.velocity.y * adjustmentValue;
         }
       }
+    }
+
+    if (this.direction.x !== 0 || this.direction.y !== 0) {
+      p.set(this.facing, this.direction);
     }
 
     //p.set(this.position, this.futurePosition);
