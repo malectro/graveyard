@@ -1,7 +1,7 @@
-#!/usr/bin/env deno run --allow-all
+#!/usr/bin/env deno run --allow-all --unstable
 
-import {emptyDir, ensureDir, walk} from 'https://deno.land/std@v0.27.0/fs/mod.ts';
-import {dirname, resolve} from 'https://deno.land/std@v0.27.0/path/mod.ts';
+import {emptyDir, ensureDir, walk} from 'https://deno.land/std@0.83.0/fs/mod.ts';
+import {dirname, resolve} from 'https://deno.land/std@0.83.0/path/mod.ts';
 
 import {projectRoot} from './common.ts';
 
@@ -14,6 +14,8 @@ if (args[1] === 'dev')  {
 
 const srcDir = resolve(projectRoot, 'src');
 const buildDir = resolve(projectRoot, 'build');
+
+console.log('srcDir', srcDir);
 
 async function main() {
   console.log('building to', buildDir);
@@ -36,11 +38,11 @@ async function main() {
   */
 
   console.log('copying statics');
-  for await (const {filename} of walk(
+  for await (const {path} of walk(
     srcDir,
     {includeDirs: false, skip: [/\.ts$/]},
   )) {
-    let promise = copyToBuild(filename) ;
+    let promise = copyToBuild(path) ;
     promises.add(promise);
     promise.then(() => {
       promises.delete(promise);
@@ -80,7 +82,7 @@ async function main() {
   });
   */
   const process = run({
-    args: [
+    cmd: [
       'npm',
       'run',
       'build',
@@ -102,7 +104,7 @@ async function main() {
   */
 }
 
-async function moveFile(filename) {
+async function moveFile(filename: string) {
   const decoder = new TextDecoder();
   const fileSrc = decoder.decode(await readFile(filename));
 
@@ -117,7 +119,7 @@ async function moveFile(filename) {
   );
 }
 
-async function copyToBuild(filename) {
+async function copyToBuild(filename: string) {
   const buildFilename = getBuildFilename(filename);
   const buildFileDir = dirname(buildFilename); 
   await ensureDir(buildFileDir);
@@ -125,7 +127,7 @@ async function copyToBuild(filename) {
   await copyFile(filename, buildFilename);
 }
 
-function getBuildFilename(filename) {
+function getBuildFilename(filename: string) {
   return resolve(buildDir, filename.replace(srcDir + '/', ''));
 }
 
