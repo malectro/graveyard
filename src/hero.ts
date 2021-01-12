@@ -32,6 +32,8 @@ export interface HeroType extends p.Point, Graphic {
   id: string;
   name: string;
   speed: number;
+  friction: number;
+  acceleration: p.Point;
   direction: p.Point;
   velocity: p.Point;
   futurePosition: p.Point;
@@ -44,7 +46,9 @@ export function create(): HeroType {
     name: 'Kyle',
     x: 0,
     y: 0,
-    speed: 0.5,
+    speed: 1,
+    friction: 0.5,
+    acceleration: p.point(),
     direction: p.point(),
     velocity: p.point(),
     futurePosition: p.point(),
@@ -54,6 +58,6 @@ export function create(): HeroType {
 }
 
 export function resolveVelocity(box: PhysicsBox): PhysicsBox {
-  p.scale(p.normalize(p.set(box.velocity, box.direction)), box.speed);
+  p.scale(p.normalize(p.set(box.acceleration, box.direction)), box.speed);
   return box;
 }

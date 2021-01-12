@@ -30,7 +30,9 @@ export class DynamicPhysics implements PhysicsBox, Physics {
   size: p.Vector2;
   halfSize: p.Vector2;
   speed = 0;
+  friction = 1;
   facing: p.Vector2 = p.point();
+  acceleration: p.Vector2 = p.point();
   direction: p.Vector2 = p.point();
   velocity: p.Vector2 = p.point();
   futurePosition: p.Vector2 = p.point();
@@ -58,18 +60,35 @@ export class DynamicPhysics implements PhysicsBox, Physics {
     return json;
   }
 
-  tick(state: State, now: number, _delta: number): void {
+  tick(state: State, now: number, delta: number): void {
     if (this.isMoving()) {
-      this.move(state.entities.values(), now);
+      this.move(state.entities.values(), now, delta);
     }
   }
 
   isMoving(): boolean {
-    return !p.isZero(this.velocity);
+    return !p.isZero(this.acceleration) || !p.isZero(this.velocity);
   }
 
-  move(entities: IterableIterator<Entity>, now: number): void {
-    const duration = now - this.lastUpdate;
+  move(entities: IterableIterator<Entity>, now: number, delta: number): void {
+    const duration = delta;
+    //const duration = now - this.lastUpdate;
+
+    p.add(
+      this.velocity,
+      p.scale({...this.acceleration}, duration),
+    );
+    p.scale(
+      this.velocity,
+      Math.pow(this.friction, duration),
+    );
+
+    console.log('acc', this.acceleration, this.velocity);
+    if (p.isZero(this.acceleration) && p.cheapLength(this.velocity) < 1) {
+      console.log('zero');
+      p.scale(this.velocity, 0);
+    }
+
     const travelVector = p.scale({...this.velocity}, duration);
 
     p.add(this.position, travelVector);

@@ -80,6 +80,10 @@ export function cheapDistance(pointA: Point, pointB: Point): number {
   return Math.abs(pointA.x - pointB.x) + Math.abs(pointA.y - pointB.y);
 }
 
+export function cheapLength(point: Point): number {
+  return Math.abs(point.x) + Math.abs(point.y);
+}
+
 export function isZero(point: Point): boolean {
   return point.x === 0 && point.y === 0;
 }
