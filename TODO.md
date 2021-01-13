@@ -6,6 +6,9 @@
   - [ ] some sort of modal
   - [ ] print tombstone data
 - [ ] entities need layering or z-index
+- [ ] map editor
+  - [ ] add sidebar
+  - [ ] add edit mode
 - [ ] create tombstone creation flow
 - [ ] spritesheet?
 - [ ] add pixel art assets

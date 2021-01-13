@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+import * as React from 'react';
+import {render} from 'react-dom';
 
 import stateJson from './data/state';
 import State from './state2';
@@ -7,6 +9,8 @@ import View from './view';
 import * as Controls from './controls';
 import * as ws from './websocket';
 import Pool from './utils/pool';
+
+import UiApp from './ui/app';
 
 async function main(): Promise<void> {
   await loadShaders();
@@ -64,6 +68,10 @@ async function main(): Promise<void> {
   //const socket = ws.start('localhost:8030', state, view);
   //Controls.init(state, socket);
   Controls.init(state2);
+
+  const uiApp = document.createElement('div');
+  render(React.createElement(UiApp), uiApp);
+  document.body.appendChild(uiApp);
 }
 
 main();
