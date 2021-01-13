@@ -27,8 +27,6 @@ export default class State {
       console.error(error);
     });
 
-    console.log('het', images);
-
     const state = Object.assign(new State(), {
       assets: IdMap.fromJSON(json.assets),
       species: IdMap.fromJSON(json.species),

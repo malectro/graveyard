@@ -74,25 +74,28 @@ export class DynamicPhysics implements PhysicsBox, Physics {
     const duration = delta;
     //const duration = now - this.lastUpdate;
 
+    // acceleration
     p.add(
       this.velocity,
       p.scale({...this.acceleration}, duration),
     );
+
+    // friction
     p.scale(
       this.velocity,
       Math.pow(this.friction, duration),
     );
 
-    console.log('acc', this.acceleration, this.velocity);
+    // prevent exponential slowdown
     if (p.isZero(this.acceleration) && p.cheapLength(this.velocity) < 1) {
-      console.log('zero');
       p.scale(this.velocity, 0);
     }
 
+    // move
     const travelVector = p.scale({...this.velocity}, duration);
-
     p.add(this.position, travelVector);
 
+    // check for collisions
     for (const entity of entities) {
       if (entity.box !== this && entity.species.collides && doBoxesIntersect(this, entity.box)) {
         this.lastHitEntity = entity;
@@ -110,6 +113,12 @@ export class DynamicPhysics implements PhysicsBox, Physics {
           adjustment.y = this.position.y - (entity.box.position.y + entity.box.size.y);
         }
 
+        if (Math.abs(adjustment.x) < Math.abs(adjustment.y)) {
+          this.position.x -= adjustment.x;
+        } else {
+          this.position.y -= adjustment.y;
+        }
+        /*
         if (this.velocity.x === 0) {
           this.position.y -= adjustment.y;
         } else if (this.velocity.y === 0) {
@@ -121,9 +130,11 @@ export class DynamicPhysics implements PhysicsBox, Physics {
           this.position.x -= this.velocity.x * adjustmentValue;
           this.position.y -= this.velocity.y * adjustmentValue;
         }
+        */
       }
     }
 
+    // adjust visible direction
     if (this.direction.x !== 0 || this.direction.y !== 0) {
       p.set(this.facing, this.direction);
     }

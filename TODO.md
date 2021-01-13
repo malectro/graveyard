@@ -19,3 +19,5 @@
 - [x] Hero should be an Entity
 - [x] allow certain sprites to block movement
   - [x] block bounding box of hero
+- [x] physics
+  - [x] collisions should not prevent perpendicular movement

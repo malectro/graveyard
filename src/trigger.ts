@@ -22,7 +22,7 @@ export class Trigger {
   }
 
   activate(): void {
-    console.log('hi', this.parent.species);
+    alert(this.parent.species.text);
   }
 
   canActivate(entity: Entity): boolean {
