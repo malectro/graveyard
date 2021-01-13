@@ -48,6 +48,16 @@ export default {
       speciesId: '2',
     },
     {
+      id: '4',
+      box: {
+        className: 'StaticPhysics',
+        position: {x: 500, y: 100},
+        size: {x: 64, y: 64},
+      },
+      assetId: '2',
+      speciesId: '2',
+    },
+    {
       id: '3',
       box: {
         className: 'DynamicPhysics',
