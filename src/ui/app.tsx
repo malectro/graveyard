@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export default function UiApp(): React.ReactNode {
+export default function UiApp({mode, onModeChange}): React.ReactNode {
   return (
     <div
       style={{
@@ -15,11 +15,14 @@ export default function UiApp(): React.ReactNode {
       }}
     >
       <Button
+        onClick={() => {
+          onModeChange(mode === 'edit' ? 'play' : 'edit');
+        }}
         style={{
           height: 30,
         }}
       >
-        Edit
+        {mode === 'edit' ? 'Play' : 'Edit'}
       </Button>
     </div>
   );
@@ -27,12 +30,17 @@ export default function UiApp(): React.ReactNode {
 
 function Button({onClick, style, children}) {
   return (
-    <div role="button" tabIndex="0" onClick={onClick} style={{
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'pointer',
-      ...style
-    }}>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        ...style,
+      }}
+    >
       {children}
     </div>
   );

@@ -6,7 +6,7 @@ import stateJson from './data/state';
 import State from './state2';
 import {loadShaders} from './graphic';
 import View from './view';
-import * as Controls from './controls';
+import {ExplorationController, GlobalInput, adaptBrowserController} from './controls';
 import * as ws from './websocket';
 import Pool from './utils/pool';
 
@@ -16,7 +16,6 @@ async function main(): Promise<void> {
   await loadShaders();
 
   const state2 = (window as any).state = await State.fromJSON(stateJson);
-  console.log('state', state2);
 
   //(<any>window).__state2 = state2;
 
@@ -67,7 +66,9 @@ async function main(): Promise<void> {
   // TODO (kyle): use websocket
   //const socket = ws.start('localhost:8030', state, view);
   //Controls.init(state, socket);
-  Controls.init(state2);
+  const globalInput = new GlobalInput();
+  globalInput.setController(new ExplorationController(state2, null));
+  globalInput.setAdapter(adaptBrowserController);
 
   const uiApp = document.createElement('div');
   render(React.createElement(UiApp), uiApp);
