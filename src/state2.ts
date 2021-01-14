@@ -14,6 +14,7 @@ export default class State {
   assets: IdMap<Asset>;
   species: IdMap<Species>;
   triggers: IdMap<Trigger>;
+  mode: 'play' | 'edit';
 
   static async fromJSON(json): Promise<State> {
     const physicsClassParser = new ClassParser([StaticPhysics, DynamicPhysics]);

@@ -6,7 +6,11 @@ import stateJson from './data/state';
 import State from './state2';
 import {loadShaders} from './graphic';
 import View from './view';
-import {ExplorationController, GlobalInput, adaptBrowserController} from './controls';
+import {
+  ExplorationController,
+  GlobalInput,
+  adaptBrowserController,
+} from './controls';
 import * as ws from './websocket';
 import Pool from './utils/pool';
 
@@ -15,7 +19,7 @@ import UiApp from './ui/app';
 async function main(): Promise<void> {
   await loadShaders();
 
-  const state2 = (window as any).state = await State.fromJSON(stateJson);
+  const state2 = ((window as any).state = await State.fromJSON(stateJson));
 
   //(<any>window).__state2 = state2;
 
@@ -50,7 +54,7 @@ async function main(): Promise<void> {
     hero.tick(state2, now, delta);
     view.focusCamera(hero.box.position);
 
-      /*
+    /*
     for (const [id, entity] of entities) {
       // cull
       if (!view.isInLoadRange(sprite)) {
@@ -67,11 +71,28 @@ async function main(): Promise<void> {
   //const socket = ws.start('localhost:8030', state, view);
   //Controls.init(state, socket);
   const globalInput = new GlobalInput();
-  globalInput.setController(new ExplorationController(state2, null));
-  globalInput.setAdapter(adaptBrowserController);
+  globalInput.setController(new ExplorationController(state2, null), adaptBrowserController);
 
   const uiApp = document.createElement('div');
-  render(React.createElement(UiApp), uiApp);
+  const renderUi = () => {
+    render(
+      React.createElement(UiApp, {
+        mode: state2.mode,
+        onModeChange: mode => {
+          console.log('mode change', mode);
+          state2.mode = mode;
+          if (mode === 'edit') {
+            globalInput.setController(null);
+          } else {
+            globalInput.setController(new ExplorationController(state2, null), adaptBrowserController);
+          }
+          renderUi();
+        },
+      }),
+      uiApp,
+    );
+  };
+  renderUi();
   document.body.appendChild(uiApp);
 }
 

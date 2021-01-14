@@ -41,8 +41,8 @@ export function adaptBrowserController(
   window.addEventListener('keyup', handleKeyUp, {capture: true});
 
   return () => {
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('keyup', handleKeyUp);
+    window.removeEventListener('keydown', handleKeyDown, {capture: true});
+    window.removeEventListener('keyup', handleKeyUp, {capture: true});
   };
 }
 
@@ -100,17 +100,18 @@ export class GlobalInput {
   private controller;
   private destroyAdapter;
 
-  setController(controller) {
+  setController(controller, adapter = null) {
     if (this.destroyAdapter) {
       this.destroyAdapter();
     }
     this.controller = controller;
+    this.destroyAdapter = adapter && adapter(controller);
   }
 
   setAdapter(adapter) {
     if (this.destroyAdapter) {
       this.destroyAdapter();
     }
-    this.destroyAdapter = adapter(this.controller);
+    this.destroyAdapter = adapter && adapter(this.controller);
   }
 }
