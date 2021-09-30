@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import {Vector2} from './utils/point';
 import {doBoxesIntersect} from './utils/box';
-import {Physics, DynamicPhysics} from './physics';
+import {Physics, DynamicPhysics, OverlayPhysics} from './physics';
 import ClassParser from './utils/class-parser';
 import {Graphic} from './graphic';
 import State from './state2';
@@ -18,6 +18,11 @@ export class Entity {
     // TODO (kyle): generic components
     if (trigger) {
       trigger.parent = this;
+    }
+
+    // TODO (kyle): should all physics/components get a reference to the entity?
+    if (this.box instanceof OverlayPhysics) {
+      this.box.entity = this;
     }
   }
 
@@ -47,13 +52,11 @@ export class Entity {
   }
 
   tick(state: State, now: number, delta: number): void {
-    // TODO (kyle): maybe make physics handle this? dirty property?
-    if (this.box instanceof DynamicPhysics) {
-      this.box.tick(state, now, delta);
-      this.graphic.update(this.box);
-      //this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
-      //this.graphic.mesh.position.set(this.box.position.x + this.box.halfSize.x, this.box.position.y + this.box.halfSize.y);
-    }
+    // TODO (kyle): maybe use dirty property to only update stuff that needs updating?
+    this.box.tick(state, now, delta);
+    this.graphic.update(this.box);
+    //this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
+    //this.graphic.mesh.position.set(this.box.position.x + this.box.halfSize.x, this.box.position.y + this.box.halfSize.y);
   }
 
   activateNearbyEntity(state: State): void {

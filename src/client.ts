@@ -8,6 +8,7 @@ import {loadShaders} from './graphic';
 import View from './view';
 import {
   ExplorationController,
+  PlacementController,
   GlobalInput,
   adaptBrowserController,
 } from './controls';
@@ -51,7 +52,12 @@ async function main(): Promise<void> {
     const now = Date.now();
     const {hero} = state2;
 
-    hero.tick(state2, now, delta);
+    //hero.tick(state2, now, delta);
+
+    for (const entity of state2.entities.values()) {
+      entity.tick(state2, now, delta);
+    }
+
     view.focusCamera(hero.box.position);
 
     /*
@@ -80,11 +86,20 @@ async function main(): Promise<void> {
         mode: state2.mode,
         onModeChange: mode => {
           console.log('mode change', mode);
-          state2.mode = mode;
           if (mode === 'edit') {
-            globalInput.setController(null);
+            state2.setMode(mode);
+            globalInput.setController(new PlacementController(state2, () => {
+              const newPlot = state2.placePlot();
+              if (newPlot) {
+                world.addChild(newPlot.graphic.mesh);
+                world.addChild(state2.futurePlot.graphic.mesh);
+              }
+            }), adaptBrowserController);
+            world.addChild(state2.futurePlot.graphic.mesh);
           } else {
             globalInput.setController(new ExplorationController(state2, null), adaptBrowserController);
+            world.removeChild(state2.futurePlot.graphic.mesh);
+            state2.setMode(mode);
           }
           renderUi();
         },

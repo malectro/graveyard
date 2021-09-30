@@ -1,4 +1,15 @@
 ## todo
+- [ ] map editor
+  - [ ] make the user enter an epitaph first
+  - [ ] add epitaph to object species/trigger
+  - [ ] hide hero when placing plot
+  - [ ] add sidebar
+  - [x] give the future plot an opacity
+  - [x] if future plot overlaps with a collider, make it red
+  - [x] allow placing the future plot when not colliding
+  - [x] make overlay items top z
+  - [x] allow moving the future plot
+  - [x] add edit mode
 - [ ] allow viewing of epitaph when walking up to tombstone
   - [x] target hit box on tombstones?
     - [x] entity component that determines activation?
@@ -6,9 +17,6 @@
   - [ ] some sort of modal
   - [ ] print tombstone data
 - [ ] entities need layering or z-index
-- [ ] map editor
-  - [ ] add sidebar
-  - [ ] add edit mode
 - [ ] create tombstone creation flow
 - [ ] spritesheet?
 - [ ] add pixel art assets

@@ -121,9 +121,9 @@ async function moveFile(filename: string) {
 
 async function copyToBuild(filename: string) {
   const buildFilename = getBuildFilename(filename);
+  console.log('copying file', filename, buildFilename);
   const buildFileDir = dirname(buildFilename); 
   await ensureDir(buildFileDir);
-  console.log('copying file', filename, buildFilename);
   await copyFile(filename, buildFilename);
 }
 

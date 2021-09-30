@@ -9,6 +9,7 @@ export interface Graphic {
   id: string;
   mesh: PIXI.Container;
   update(physics: Physics): void;
+  copy(): Graphic;
 }
 
 export class StaticGraphic implements Graphic {
@@ -28,7 +29,7 @@ export class StaticGraphic implements Graphic {
       mesh.shader = shaderCache.get(reference);
       graphic.mesh = mesh;
     } else {
-      const texture = PIXI.Texture.from(`/assets/${reference}`, {
+      const texture = PIXI.Texture.from(`assets/${reference}`, {
         alphaMode: PIXI.ALPHA_MODES.UNPACK,
         scaleMode: PIXI.SCALE_MODES.NEAREST,
         //width: json.sourceSize.width,
@@ -62,12 +63,16 @@ export class StaticGraphic implements Graphic {
       ...this.asset,
       id: this.id,
       type: this.asset.type,
-      src: reference,
+      //src: reference,
     };
   }
 
   update(physics: Physics): void {
     this.mesh.position.set(physics.position.x, physics.position.y);
+  }
+
+  copy(): StaticGraphic {
+    return StaticGraphic.fromJSON(this.toJSON());
   }
 }
 
@@ -137,6 +142,10 @@ export class AnimatedGraphic implements Graphic {
       this.state = state;
     }
   }
+
+  copy(): AnimatedGraphic {
+    return AnimatedGraphic.fromJSON(this.toJSON());
+  }
 }
 
 export interface Asset {
@@ -154,7 +163,7 @@ export interface Asset {
 }
 
 function createTexture(src: string) {
-      return PIXI.Texture.from(`/assets/${src}`, {
+      return PIXI.Texture.from(`assets/${src}`, {
         alphaMode: PIXI.ALPHA_MODES.UNPACK,
         scaleMode: PIXI.SCALE_MODES.NEAREST,
         //width: json.sourceSize.width,

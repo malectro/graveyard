@@ -96,6 +96,33 @@ const browserExplorationAdapter = {
   ' ': {method: 'activate'},
 };
 
+export class PlacementController {
+  static directions = {
+    down: {x: 0, y: 1},
+    up: {x: 0, y: -1},
+    right: {x: 1, y: 0},
+    left: {x: -1, y: 0},
+  };
+
+  constructor(private state: State, private onPlace: () => void) {}
+
+  direction(buttonOn: boolean, direction) {
+    const vector = ExplorationController.directions[direction];
+    console.log('moving', vector, buttonOn);
+    if (buttonOn) {
+      PointMath.add(this.state.futurePlot.box.position, PointMath.scale(PointMath.copy(vector), 10));
+    }
+  }
+
+  activate(buttonOn: boolean) {
+    if (buttonOn) {
+      this.onPlace();
+    }
+    // TODO (kyle): place the tombstone
+    //this.state.futurePlot.place(this.state);
+  }
+}
+
 export class GlobalInput {
   private controller;
   private destroyAdapter;

@@ -1,15 +1,18 @@
 import * as Hero from './hero.js';
 import {Asset} from './graphic';
 import {Entity, PhysicsEntity, Species} from './entity';
-import {DynamicPhysics, StaticPhysics} from './physics';
+import {DynamicPhysics, StaticPhysics, OverlayPhysics} from './physics';
 import {AnimatedGraphic, StaticGraphic} from './graphic';
 import {HeroSpecies} from './hero';
 import ClassParser, {Parser} from './utils/class-parser';
 import {Trigger} from './trigger';
 import {IdMap} from './utils/id-map';
+import {newId} from './utils/id';
+import * as p from './utils/point';
 
 export default class State {
   hero: PhysicsEntity;
+  futurePlot: Entity;
   entities: IdMap<Entity>;
   assets: IdMap<Asset>;
   species: IdMap<Species>;
@@ -44,6 +47,51 @@ export default class State {
 
     return state;
   }
+
+  setMode(mode: 'play' | 'edit') {
+    this.mode = mode;
+    if (mode === 'edit') {
+      this.futurePlot = new Entity(
+        'futurePlot',
+        new OverlayPhysics(
+          // TODO (kyle): position at center of screen
+          {x: 0, y: 0},
+          {x: 128, y: 128},
+        ),
+        // TODO (kyle): using headstone graphic here
+        StaticGraphic.fromJSON(this.assets.get('1')),
+        // TODO (kyle): don't use grass for this?
+        this.species.get('2'),
+      );
+      this.futurePlot.graphic.mesh.alpha = 0.5;
+      this.entities.set(this.futurePlot.id, this.futurePlot);
+    } else {
+      this.entities.delete(this.futurePlot.id);
+      this.futurePlot = null;
+    }
+  }
+
+  placePlot(): Entity | undefined {
+    const {box} = this.futurePlot;
+    if (box instanceof OverlayPhysics && box.isColliding(this)) {
+      return;
+    }
+
+    const newPlot = new Entity(
+      newId(),
+      new StaticPhysics(
+        p.copy(box.position),
+        p.copy(box.size),
+      ),
+      this.futurePlot.graphic.copy(),
+      // TODO (kyle): are species right for collision?
+      this.species.get('1'),
+    );
+
+    this.entities.set(newPlot.id, newPlot);
+
+    return newPlot;
+  }
 }
 
 function loadImage(src: string): Promise<unknown> {
@@ -53,6 +101,6 @@ function loadImage(src: string): Promise<unknown> {
     image.addEventListener('load', () => resolve(image));
     image.addEventListener('error', reject);
 
-    image.src = `/assets/${src}`;
+    image.src = `assets/${src}`;
   });
 }

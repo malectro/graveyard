@@ -8,15 +8,14 @@ import State from './state2';
 export interface Physics extends Component, Box {}
 
 export class StaticPhysics implements Physics {
-  position: p.Vector2;
-  size: p.Vector2;
   halfSize: p.Vector2;
 
+  constructor(public position: p.Vector2, public size: p.Vector2) {
+    this.halfSize = p.scale(p.copy(this.size), 0.5);
+  }
+
   static fromJSON(json: any): StaticPhysics {
-    const physics = new this();
-    physics.position = json.position;
-    physics.size = json.size;
-    physics.halfSize = p.scale(p.copy(json.size), 0.5);
+    const physics = new this(json.position, json.size);
     return physics;
   }
 
@@ -142,5 +141,40 @@ export class DynamicPhysics implements PhysicsBox, Physics {
     //p.set(this.position, this.futurePosition);
 
     this.lastUpdate = now;
+  }
+}
+
+export class OverlayPhysics implements Physics {
+  entity: Entity;
+  position: p.Vector2;
+  size: p.Vector2;
+  halfSize: p.Vector2;
+
+  constructor(position: p.Vector2, size: p.Vector2) {
+    this.position = position;
+    this.size = size;
+    this.halfSize = p.scale(p.copy(this.size), 0.5);
+  }
+
+  tick(state: State, now: number, _delta: number): void {
+    if (this.entity.graphic.mesh instanceof PIXI.Sprite) {
+      // TODO (kyle): not sure physics should be in charge of this.
+      if (this.isColliding(state)) {
+        this.entity.graphic.mesh.tint = 0xff0000;
+      } else {
+        this.entity.graphic.mesh.tint = 0xffffff;
+      }
+    }
+  }
+
+  isColliding(state: State): boolean {
+    let collides = false;
+    for (const entity of state.entities.values()) {
+      if (entity.box !== this && entity.species.collides && doBoxesIntersect(this, entity.box)) {
+        collides = true;
+      }
+    }
+
+    return collides;
   }
 }
