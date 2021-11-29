@@ -11,13 +11,17 @@ import {newId} from './utils/id';
 import * as p from './utils/point';
 
 export default class State {
+  // persistent data
   hero: PhysicsEntity;
-  futurePlot: Entity;
   entities: IdMap<Entity>;
   assets: IdMap<Asset>;
   species: IdMap<Species>;
   triggers: IdMap<Trigger>;
+
+  // ephemeral ui data
   mode: 'play' | 'edit';
+  futurePlot: Entity;
+  dialog: React.ReactNode | null = null;
 
   static async fromJSON(json): Promise<State> {
     const physicsClassParser = new ClassParser([StaticPhysics, DynamicPhysics]);
@@ -71,7 +75,7 @@ export default class State {
     }
   }
 
-  placePlot(): Entity | undefined {
+  placePlot(text: string): Entity | undefined {
     const {box} = this.futurePlot;
     if (box instanceof OverlayPhysics && box.isColliding(this)) {
       return;
@@ -85,7 +89,13 @@ export default class State {
       ),
       this.futurePlot.graphic.copy(),
       // TODO (kyle): are species right for collision?
-      this.species.get('1'),
+      {
+        id: newId(),
+        collides: true,
+        triggers: true,
+        text,
+      },
+      Trigger.fromJSON(this.triggers.get('1').toJSON()),
     );
 
     this.entities.set(newPlot.id, newPlot);

@@ -1,47 +1,73 @@
 import * as React from 'react';
+import {Button} from './button';
+import {css} from '@emotion/css';
+import styled from '@emotion/styled';
 
-export default function UiApp({mode, onModeChange}): React.ReactNode {
+export default function UiApp({state, mode, onModeChange}): React.ReactNode {
+  const {dialog} = state;
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: 80,
-        flexFlow: 'column',
-        background: 'rgba(255, 255, 255, 0.1)',
-        color: 'white',
-      }}
-    >
-      <Button
-        onClick={() => {
-          onModeChange(mode === 'edit' ? 'play' : 'edit');
-        }}
+    <div>
+      <div
         style={{
-          height: 30,
+          display: 'flex',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: 80,
+          flexFlow: 'column',
+          background: 'rgba(255, 255, 255, 0.1)',
+          color: 'white',
         }}
       >
-        {mode === 'edit' ? 'Play' : 'Edit'}
-      </Button>
+        <Button
+          onClick={() => {
+            onModeChange(mode === 'edit' ? 'play' : 'edit');
+          }}
+          style={{
+            height: 30,
+          }}
+        >
+          {mode === 'edit' ? 'Play' : 'Edit'}
+        </Button>
+      </div>
+
+      {dialog && <DialogField>{dialog}</DialogField>}
     </div>
   );
 }
 
-function Button({onClick, style, children}) {
+function DialogField({children}) {
   return (
     <div
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        ...style,
-      }}
+      className={css`
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+      `}
     >
-      {children}
+      <div
+        className={css`
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+        `}
+      />
+      <div
+        className={css`
+          z-index: 1;
+        `}
+      >
+        {children}
+      </div>
     </div>
   );
 }

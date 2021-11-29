@@ -21,15 +21,17 @@
   },
   "homepage": "https://github.com/malectro/graveyard#readme",
   "dependencies": {
+    "@emotion/css": "^11.5.0",
+    "@emotion/styled": "^11.6.0",
     "pixi.js": "^5.2.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "rxjs": "^6.5.3",
     "ws": "^7.2.0"
   },
   "devDependencies": {
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
     "acorn-jsx": "^5.1.0",

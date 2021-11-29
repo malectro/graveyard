@@ -16,6 +16,7 @@ import * as ws from './websocket';
 import Pool from './utils/pool';
 
 import UiApp from './ui/app';
+import EpitaphDialog from './ui/EpitaphDialog';
 
 async function main(): Promise<void> {
   await loadShaders();
@@ -77,38 +78,63 @@ async function main(): Promise<void> {
   //const socket = ws.start('localhost:8030', state, view);
   //Controls.init(state, socket);
   const globalInput = new GlobalInput();
-  globalInput.setController(new ExplorationController(state2, null), adaptBrowserController);
+  globalInput.setController(
+    new ExplorationController(state2, null),
+    adaptBrowserController,
+  );
 
-  const uiApp = document.createElement('div');
+  const uiAppElement = document.createElement('div');
+  let uiApp;
   const renderUi = () => {
-    render(
+    uiApp = render(
       React.createElement(UiApp, {
+        state: state2,
         mode: state2.mode,
         onModeChange: mode => {
-          console.log('mode change', mode);
           if (mode === 'edit') {
             state2.setMode(mode);
-            globalInput.setController(new PlacementController(state2, () => {
-              const newPlot = state2.placePlot();
-              if (newPlot) {
-                world.addChild(newPlot.graphic.mesh);
-                world.addChild(state2.futurePlot.graphic.mesh);
-              }
-            }), adaptBrowserController);
+            globalInput.setController(
+              new PlacementController(state2, () => {
+                setDialog(EpitaphDialog, {
+                  onPost: (text: string) => {
+                    const newPlot = state2.placePlot(text);
+                    if (newPlot) {
+                      world.addChild(newPlot.graphic.mesh);
+                      world.addChild(state2.futurePlot.graphic.mesh);
+                    }
+                  },
+                });
+              }),
+              adaptBrowserController,
+            );
             world.addChild(state2.futurePlot.graphic.mesh);
           } else {
-            globalInput.setController(new ExplorationController(state2, null), adaptBrowserController);
+            globalInput.setController(
+              new ExplorationController(state2, null),
+              adaptBrowserController,
+            );
             world.removeChild(state2.futurePlot.graphic.mesh);
             state2.setMode(mode);
           }
           renderUi();
         },
       }),
-      uiApp,
+      uiAppElement,
     );
   };
   renderUi();
-  document.body.appendChild(uiApp);
+
+  const setDialog = (dialog, props) => {
+    state2.dialog = React.createElement(dialog, {
+      ...props,
+      onClose: () => {
+        state2.dialog = null;
+        renderUi();
+      },
+    });
+    renderUi();
+  };
+  document.body.appendChild(uiAppElement);
 }
 
 main();
