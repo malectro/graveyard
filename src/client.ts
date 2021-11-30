@@ -125,9 +125,11 @@ async function main(): Promise<void> {
   renderUi();
 
   const setDialog = (dialog, props) => {
+    globalInput.pauseAdapter();
     state2.dialog = React.createElement(dialog, {
       ...props,
       onClose: () => {
+        globalInput.startAdapter();
         state2.dialog = null;
         renderUi();
       },

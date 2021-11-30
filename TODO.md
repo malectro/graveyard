@@ -1,9 +1,11 @@
 ## todo
 - [ ] map editor
-  - [ ] make the user enter an epitaph first
-  - [ ] add epitaph to object species/trigger
+  - [ ] allow typing spaces (remove global key event handler)
   - [ ] hide hero when placing plot
   - [ ] add sidebar
+  - [ ] allow moving future plot with mouse
+  - [x] add epitaph to object species/trigger
+  - [x] make the user enter an epitaph first
   - [x] give the future plot an opacity
   - [x] if future plot overlaps with a collider, make it red
   - [x] allow placing the future plot when not colliding

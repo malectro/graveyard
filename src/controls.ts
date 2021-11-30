@@ -125,12 +125,14 @@ export class PlacementController {
 
 export class GlobalInput {
   private controller;
+  private adapter;
   private destroyAdapter;
 
   setController(controller, adapter = null) {
     if (this.destroyAdapter) {
       this.destroyAdapter();
     }
+    this.adapter = adapter;
     this.controller = controller;
     this.destroyAdapter = adapter && adapter(controller);
   }
@@ -139,6 +141,20 @@ export class GlobalInput {
     if (this.destroyAdapter) {
       this.destroyAdapter();
     }
+    this.adapter = adapter;
     this.destroyAdapter = adapter && adapter(this.controller);
+  }
+
+  pauseAdapter() {
+    if (this.destroyAdapter) {
+      this.destroyAdapter();
+    }
+  }
+
+  startAdapter() {
+    const {adapter} = this;
+    if (adapter) {
+      this.destroyAdapter = adapter && adapter(this.controller);
+    }
   }
 }
