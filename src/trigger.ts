@@ -1,6 +1,8 @@
 import * as p from './utils/point';
 import {Box, createBox, copy, setOffset, doBoxesIntersect} from './utils/box';
 import {Entity} from './entity';
+import {getGame} from './game';
+import AlertDialog from './ui/AlertDialog';
 
 
 export class Trigger {
@@ -22,7 +24,10 @@ export class Trigger {
   }
 
   activate(): void {
-    alert(this.parent.species.text);
+    getGame().ui.setDialog(
+      AlertDialog,
+      {text: this.parent.species.text},
+    );
   }
 
   canActivate(entity: Entity): boolean {

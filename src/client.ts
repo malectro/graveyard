@@ -14,6 +14,8 @@ import {
 } from './controls';
 import * as ws from './websocket';
 import Pool from './utils/pool';
+import {init as initUi} from './ui';
+import {getGame, setGame, Game} from './game'
 
 import UiApp from './ui/app';
 import EpitaphDialog from './ui/EpitaphDialog';
@@ -21,7 +23,11 @@ import EpitaphDialog from './ui/EpitaphDialog';
 async function main(): Promise<void> {
   await loadShaders();
 
+  let game: Game = {};
+  setGame(game);
+
   const state2 = ((window as any).state = await State.fromJSON(stateJson));
+  game.state = state2;
 
   //(<any>window).__state2 = state2;
 
@@ -36,6 +42,7 @@ async function main(): Promise<void> {
   const view = new View(app, {cameraPaddingPercentage: 0.2});
 
   const world = new PIXI.Container();
+  game.world = world;
 
   const {hero} = state2;
   for (const entity of state2.entities.values()) {
@@ -83,60 +90,9 @@ async function main(): Promise<void> {
     adaptBrowserController,
   );
 
-  const uiAppElement = document.createElement('div');
-  let uiApp;
-  const renderUi = () => {
-    uiApp = render(
-      React.createElement(UiApp, {
-        state: state2,
-        mode: state2.mode,
-        onModeChange: mode => {
-          if (mode === 'edit') {
-            state2.setMode(mode);
-            globalInput.setController(
-              new PlacementController(state2, () => {
-                setDialog(EpitaphDialog, {
-                  onPost: (text: string) => {
-                    const newPlot = state2.placePlot(text);
-                    if (newPlot) {
-                      world.addChild(newPlot.graphic.mesh);
-                      world.addChild(state2.futurePlot.graphic.mesh);
-                    }
-                  },
-                });
-              }),
-              adaptBrowserController,
-            );
-            world.addChild(state2.futurePlot.graphic.mesh);
-          } else {
-            globalInput.setController(
-              new ExplorationController(state2, null),
-              adaptBrowserController,
-            );
-            world.removeChild(state2.futurePlot.graphic.mesh);
-            state2.setMode(mode);
-          }
-          renderUi();
-        },
-      }),
-      uiAppElement,
-    );
-  };
-  renderUi();
+  game.globalInput = globalInput;
 
-  const setDialog = (dialog, props) => {
-    globalInput.pauseAdapter();
-    state2.dialog = React.createElement(dialog, {
-      ...props,
-      onClose: () => {
-        globalInput.startAdapter();
-        state2.dialog = null;
-        renderUi();
-      },
-    });
-    renderUi();
-  };
-  document.body.appendChild(uiAppElement);
+  game.ui = initUi(game);
 }
 
 main();

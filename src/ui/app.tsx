@@ -3,8 +3,8 @@ import {Button} from './button';
 import {css} from '@emotion/css';
 import styled from '@emotion/styled';
 
-export default function UiApp({state, mode, onModeChange}): React.ReactNode {
-  const {dialog} = state;
+export default function UiApp({game, mode, onModeChange}): React.ReactNode {
+  const {dialog} = game.state;
 
   return (
     <div>
@@ -32,12 +32,12 @@ export default function UiApp({state, mode, onModeChange}): React.ReactNode {
         </Button>
       </div>
 
-      {dialog && <DialogField>{dialog}</DialogField>}
+      {dialog && <DialogField game={game}>{dialog}</DialogField>}
     </div>
   );
 }
 
-function DialogField({children}) {
+function DialogField({game, children}) {
   return (
     <div
       className={css`
@@ -52,6 +52,7 @@ function DialogField({children}) {
       `}
     >
       <div
+        onClick={() => game.ui.closeDialog()}
         className={css`
           position: absolute;
           top: 0;
