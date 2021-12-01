@@ -61,7 +61,7 @@ export class DynamicPhysics implements PhysicsBox, Physics {
 
   tick(state: State, now: number, delta: number): void {
     if (this.isMoving()) {
-      this.move(state.entities.values(), now, delta);
+      this.move(state, now, delta);
     }
   }
 
@@ -69,7 +69,7 @@ export class DynamicPhysics implements PhysicsBox, Physics {
     return !p.isZero(this.acceleration) || !p.isZero(this.velocity);
   }
 
-  move(entities: IterableIterator<Entity>, now: number, delta: number): void {
+  move(state: State, now: number, delta: number): void {
     const duration = delta;
     //const duration = now - this.lastUpdate;
 
@@ -95,7 +95,20 @@ export class DynamicPhysics implements PhysicsBox, Physics {
     p.add(this.position, travelVector);
 
     // check for collisions
-    for (const entity of entities) {
+    this.adjustForCollisions(state);
+
+    // adjust visible direction
+    if (this.direction.x !== 0 || this.direction.y !== 0) {
+      p.set(this.facing, this.direction);
+    }
+
+    //p.set(this.position, this.futurePosition);
+
+    this.lastUpdate = now;
+  }
+
+  adjustForCollisions(state: State) {
+    for (const entity of state.entities.values()) {
       if (entity.box !== this && entity.species.collides && doBoxesIntersect(this, entity.box)) {
         this.lastHitEntity = entity;
 
@@ -132,15 +145,6 @@ export class DynamicPhysics implements PhysicsBox, Physics {
         */
       }
     }
-
-    // adjust visible direction
-    if (this.direction.x !== 0 || this.direction.y !== 0) {
-      p.set(this.facing, this.direction);
-    }
-
-    //p.set(this.position, this.futurePosition);
-
-    this.lastUpdate = now;
   }
 }
 

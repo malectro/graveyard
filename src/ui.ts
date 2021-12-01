@@ -17,7 +17,7 @@ export interface UI {
 }
 
 export function init(game): UI {
-  const{world, globalInput, state} = game;
+  const {world, globalInput, state} = game;
   const uiAppElement = document.createElement('div');
   let uiApp;
   const renderUi = () => {
@@ -25,34 +25,7 @@ export function init(game): UI {
       React.createElement(UiApp, {
         game,
         mode: state.mode,
-        onModeChange: mode => {
-          if (mode === 'edit') {
-            state.setMode(mode);
-            globalInput.setController(
-              new PlacementController(state, () => {
-                setDialog(EpitaphDialog, {
-                  onPost: (text: string) => {
-                    const newPlot = state.placePlot(text);
-                    if (newPlot) {
-                      world.addChild(newPlot.graphic.mesh);
-                      world.addChild(state.futurePlot.graphic.mesh);
-                    }
-                  },
-                });
-              }),
-              adaptBrowserController,
-            );
-            world.addChild(state.futurePlot.graphic.mesh);
-          } else {
-            globalInput.setController(
-              new ExplorationController(state, null),
-              adaptBrowserController,
-            );
-            world.removeChild(state.futurePlot.graphic.mesh);
-            state.setMode(mode);
-          }
-          renderUi();
-        },
+        onModeChange: mode => game.setMode(mode),
       }),
       uiAppElement,
     );

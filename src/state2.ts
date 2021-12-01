@@ -52,27 +52,15 @@ export default class State {
     return state;
   }
 
-  setMode(mode: 'play' | 'edit') {
-    this.mode = mode;
-    if (mode === 'edit') {
-      this.futurePlot = new Entity(
-        'futurePlot',
-        new OverlayPhysics(
-          // TODO (kyle): position at center of screen
-          {x: 0, y: 0},
-          {x: 128, y: 128},
-        ),
-        // TODO (kyle): using headstone graphic here
-        StaticGraphic.fromJSON(this.assets.get('1')),
-        // TODO (kyle): don't use grass for this?
-        this.species.get('2'),
-      );
-      this.futurePlot.graphic.mesh.alpha = 0.5;
-      this.entities.set(this.futurePlot.id, this.futurePlot);
-    } else {
-      this.entities.delete(this.futurePlot.id);
-      this.futurePlot = null;
-    }
+  createSpecies(props): Species {
+    const species = {
+      id: newId(),
+      ...props,
+    };
+
+    this.species.set(species.id, species);
+
+    return species;
   }
 
   placePlot(text: string): Entity | undefined {
@@ -89,12 +77,11 @@ export default class State {
       ),
       this.futurePlot.graphic.copy(),
       // TODO (kyle): are species right for collision?
-      {
-        id: newId(),
+      this.createSpecies({
         collides: true,
         triggers: true,
         text,
-      },
+      }),
       Trigger.fromJSON(this.triggers.get('1').toJSON()),
     );
 

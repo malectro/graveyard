@@ -1,9 +1,9 @@
 ## todo
 - [ ] map editor
-  - [ ] allow typing spaces (remove global key event handler)
-  - [ ] hide hero when placing plot
   - [ ] add sidebar
   - [ ] allow moving future plot with mouse
+  - [x] hide hero when placing plot
+  - [x] allow typing spaces (remove global key event handler)
   - [x] add epitaph to object species/trigger
   - [x] make the user enter an epitaph first
   - [x] give the future plot an opacity
@@ -12,21 +12,21 @@
   - [x] make overlay items top z
   - [x] allow moving the future plot
   - [x] add edit mode
-- [ ] allow viewing of epitaph when walking up to tombstone
-  - [x] target hit box on tombstones?
-    - [x] entity component that determines activation?
-    - [ ] child entities?
-  - [ ] some sort of modal
-  - [ ] print tombstone data
 - [ ] entities need layering or z-index
 - [ ] create tombstone creation flow
 - [ ] spritesheet?
-- [ ] add pixel art assets
-  - [x] animate the hero
-  - [ ] add all up/down animations
-  - [ ] add all diagonal animations
 
 ## done
+- [x] add pixel art assets
+  - [x] animate the hero
+  - [x] add all up/down animations
+  - [x] add all diagonal animations
+- [x] allow viewing of epitaph when walking up to tombstone
+  - [x] target hit box on tombstones?
+    - [x] entity component that determines activation?
+    - [ ] child entities?
+  - [x] some sort of modal
+  - [x] print tombstone data
 - [x] textures should be shared
 - [x] add acceleration and friction
 - [x] Hero should be an Entity

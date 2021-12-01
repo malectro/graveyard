@@ -23,7 +23,7 @@ import EpitaphDialog from './ui/EpitaphDialog';
 async function main(): Promise<void> {
   await loadShaders();
 
-  let game: Game = {};
+  let game: Game = new Game();
   setGame(game);
 
   const state2 = ((window as any).state = await State.fromJSON(stateJson));
@@ -38,6 +38,7 @@ async function main(): Promise<void> {
     autoDensity: true,
   });
   document.body.appendChild(app.view);
+  game.pixi = app;
 
   const view = new View(app, {cameraPaddingPercentage: 0.2});
 
