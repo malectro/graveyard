@@ -40,9 +40,21 @@ export function adaptBrowserController(
 
   window.addEventListener('keyup', handleKeyUp, {capture: true});
 
+  const handlePointerMove = event => {
+    if (controller.pointerMove) {
+      controller.pointerMove(
+        event.clientX,
+        event.clientY,
+      );
+    }
+  };
+
+  window.addEventListener('pointermove', handlePointerMove);
+
   return () => {
     window.removeEventListener('keydown', handleKeyDown, {capture: true});
     window.removeEventListener('keyup', handleKeyUp, {capture: true});
+    window.removeEventListener('pointermove', handlePointerMove);
   };
 }
 
@@ -120,6 +132,13 @@ export class PlacementController {
     }
     // TODO (kyle): place the tombstone
     //this.state.futurePlot.place(this.state);
+  }
+
+  pointerMove(x, y) {
+    // TODO
+      this.state.futurePlot.box.position,
+      x,
+      y,
   }
 }
 

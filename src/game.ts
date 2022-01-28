@@ -10,6 +10,7 @@ import {
   GlobalInput,
   adaptBrowserController,
 } from './controls';
+import View from './view';
 import EpitaphDialog from './ui/EpitaphDialog';
 
 let _game;
@@ -26,6 +27,7 @@ export class Game {
   pixi: PIXI.Application;
   world: PIXI.Container;
   state: State;
+  view: View;
   globalInput: GlobalInput;
   ui: UI;
 

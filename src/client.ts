@@ -44,6 +44,7 @@ async function main(): Promise<void> {
 
   const world = new PIXI.Container();
   game.world = world;
+  game.view = view;
 
   const {hero} = state2;
   state2.focus = hero;
