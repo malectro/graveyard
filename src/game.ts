@@ -53,6 +53,7 @@ export class Game {
         // TODO (kyle): don't use grass for this?
         state.species.get('2'),
       );
+      state.focus = state.futurePlot;
       state.futurePlot.graphic.mesh.alpha = 0.5;
       state.entities.set(state.futurePlot.id, state.futurePlot);
 
@@ -82,6 +83,7 @@ export class Game {
       this.world.removeChild(state.futurePlot.graphic.mesh);
       state.entities.delete(state.futurePlot.id);
       state.futurePlot = null;
+      state.focus = state.hero;
       state.hero.species = state.species.get('3');
       state.hero.box.adjustForCollisions(state);
       this.pixi.stage.addChild(state.hero.graphic.mesh);

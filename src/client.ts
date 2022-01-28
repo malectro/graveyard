@@ -46,6 +46,7 @@ async function main(): Promise<void> {
   game.world = world;
 
   const {hero} = state2;
+  state2.focus = hero;
   for (const entity of state2.entities.values()) {
     if (entity !== hero) {
       console.log('adding', entity, entity.graphic.mesh);
@@ -59,7 +60,7 @@ async function main(): Promise<void> {
 
   app.ticker.add(delta => {
     const now = Date.now();
-    const {hero} = state2;
+    const {hero, focus} = state2;
 
     //hero.tick(state2, now, delta);
 
@@ -67,7 +68,9 @@ async function main(): Promise<void> {
       entity.tick(state2, now, delta);
     }
 
-    view.focusCamera(hero.box.position);
+    if (focus != null) {
+      view.focusCamera(focus.box.position);
+    }
 
     /*
     for (const [id, entity] of entities) {

@@ -1,8 +1,27 @@
 ## todo
-- [ ] map editor
-  - [ ] add sidebar
+- [ ] create tombstone creation flow
+  - [ ] map should follow future tombstone
   - [ ] allow moving future plot with mouse
-  - [ ] exit creation after a tombstone is created
+  - [ ] add sidebar
+  - [ ] exquisite corpse?
+  - [ ] symmetric pixel editing?
+  - [ ] design some tombstones
+- [ ] save tombstones to db
+  - [ ] db service?
+- [ ] stream entities/map from db
+  - [ ] stream entities based on location
+- [ ] environment
+  - [ ] some sort of procedural generation of foliage?
+  - [ ] admin foliage editor?
+- [ ] navigation
+  - [ ] design player characters
+  - [ ] players that have created tombstones are ghosts
+- [ ] spritesheet?
+- [ ] entities need layering or z-index
+
+## done
+- [x] map editor
+  - [x] exit creation after a tombstone is created
   - [x] hide hero when placing plot
   - [x] allow typing spaces (remove global key event handler)
   - [x] add epitaph to object species/trigger
@@ -13,11 +32,6 @@
   - [x] make overlay items top z
   - [x] allow moving the future plot
   - [x] add edit mode
-- [ ] entities need layering or z-index
-- [ ] create tombstone creation flow
-- [ ] spritesheet?
-
-## done
 - [x] add pixel art assets
   - [x] animate the hero
   - [x] add all up/down animations

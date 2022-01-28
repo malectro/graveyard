@@ -12,6 +12,7 @@ import * as p from './utils/point';
 
 export default class State {
   // persistent data
+  focus: Entity | null;
   hero: PhysicsEntity;
   entities: IdMap<Entity>;
   assets: IdMap<Asset>;
