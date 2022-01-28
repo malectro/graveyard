@@ -2,6 +2,7 @@
 - [ ] map editor
   - [ ] add sidebar
   - [ ] allow moving future plot with mouse
+  - [ ] exit creation after a tombstone is created
   - [x] hide hero when placing plot
   - [x] allow typing spaces (remove global key event handler)
   - [x] add epitaph to object species/trigger
