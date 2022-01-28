@@ -67,6 +67,7 @@ export class Game {
               if (newPlot) {
                 this.world.addChild(newPlot.graphic.mesh);
                 this.world.addChild(state.futurePlot.graphic.mesh);
+                this.setMode('play');
               }
             },
           });
