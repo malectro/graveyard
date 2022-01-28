@@ -2,6 +2,7 @@ import * as PointMath from './utils/point';
 import * as Hero from './hero';
 import {Socket, sendMessage} from './websocket';
 import State from './state2';
+import {Game} from './game';
 
 export function adaptBrowserController(
   controller: Controller,
@@ -40,21 +41,36 @@ export function adaptBrowserController(
 
   window.addEventListener('keyup', handleKeyUp, {capture: true});
 
+  const handlePointerDown = event => {
+    if (controller.pointerDown) {
+      controller.pointerDown(event.clientX, event.clientY);
+    }
+  };
+
+  window.addEventListener('pointerdown', handlePointerDown);
+
   const handlePointerMove = event => {
     if (controller.pointerMove) {
-      controller.pointerMove(
-        event.clientX,
-        event.clientY,
-      );
+      controller.pointerMove(event.clientX, event.clientY);
     }
   };
 
   window.addEventListener('pointermove', handlePointerMove);
 
+  const handlePointerUp = event => {
+    if (controller.pointerUp) {
+      controller.pointerUp(event.clientX, event.clientY);
+    }
+  };
+
+  window.addEventListener('pointerup', handlePointerUp);
+
   return () => {
     window.removeEventListener('keydown', handleKeyDown, {capture: true});
     window.removeEventListener('keyup', handleKeyUp, {capture: true});
+    window.removeEventListener('pointerdown', handlePointerDown);
     window.removeEventListener('pointermove', handlePointerMove);
+    window.removeEventListener('pointerup', handlePointerUp);
   };
 }
 
@@ -69,25 +85,25 @@ export class ExplorationController {
     left: {x: -1, y: 0},
   };
 
-  constructor(private state: State, private socket: Socket) {}
+  constructor(private game: Game, private socket: Socket) {}
 
   direction(buttonOn: boolean, direction) {
     const vector = ExplorationController.directions[direction];
     if (buttonOn) {
-      PointMath.add(this.state.hero.box.direction, vector);
+      PointMath.add(this.game.state.hero.box.direction, vector);
     } else {
-      PointMath.subtract(this.state.hero.box.direction, vector);
+      PointMath.subtract(this.game.state.hero.box.direction, vector);
     }
     this.resolveVelocity();
   }
 
   activate(_buttonOn: boolean) {
-    this.state.hero.activateNearbyEntity(this.state);
+    this.game.state.hero.activateNearbyEntity(this.game.state);
   }
 
   resolveVelocity() {
-    this.state.hero.box.lastUpdate = Date.now();
-    Hero.resolveVelocity(this.state.hero.box);
+    this.game.state.hero.box.lastUpdate = Date.now();
+    Hero.resolveVelocity(this.game.state.hero.box);
 
     /*
     if (this.socket) {
@@ -116,13 +132,18 @@ export class PlacementController {
     left: {x: -1, y: 0},
   };
 
-  constructor(private state: State, private onPlace: () => void) {}
+  private isPointerDown = false;
+
+  constructor(private game: Game, private onPlace: () => void) {}
 
   direction(buttonOn: boolean, direction) {
     const vector = ExplorationController.directions[direction];
     console.log('moving', vector, buttonOn);
     if (buttonOn) {
-      PointMath.add(this.state.futurePlot.box.position, PointMath.scale(PointMath.copy(vector), 10));
+      PointMath.add(
+        this.game.state.futurePlot.box.position,
+        PointMath.scale(PointMath.copy(vector), 10),
+      );
     }
   }
 
@@ -134,11 +155,29 @@ export class PlacementController {
     //this.state.futurePlot.place(this.state);
   }
 
+  move(x, y) {
+    const {view, state} = this.game;
+    const {box} = state.futurePlot;
+    const {stage} = view.app;
+    PointMath.set(box.position, {
+      x: x - stage.x - box.size.x / 2,
+      y: y - stage.y - box.size.y / 2,
+    });
+  }
+
+  pointerDown(x, y) {
+    this.isPointerDown = true;
+    this.move(x, y);
+  }
+
   pointerMove(x, y) {
-    // TODO
-      this.state.futurePlot.box.position,
-      x,
-      y,
+    if (this.isPointerDown) {
+      this.move(x, y);
+    }
+  }
+
+  pointerUp(x, y) {
+    this.isPointerDown = false;
   }
 }
 

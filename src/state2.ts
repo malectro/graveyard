@@ -12,7 +12,6 @@ import * as p from './utils/point';
 
 export default class State {
   // persistent data
-  focus: Entity | null;
   hero: PhysicsEntity;
   entities: IdMap<Entity>;
   assets: IdMap<Asset>;
@@ -20,6 +19,7 @@ export default class State {
   triggers: IdMap<Trigger>;
 
   // ephemeral ui data
+  focus: Entity | null;
   mode: 'play' | 'edit';
   futurePlot: Entity;
   dialog: React.ReactNode | null = null;

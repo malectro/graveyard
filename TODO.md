@@ -1,7 +1,7 @@
 ## todo
 - [ ] create tombstone creation flow
   - [x] map should follow future tombstone
-  - [ ] allow moving future plot with mouse
+  - [x] allow moving future plot with mouse
   - [ ] add sidebar
   - [ ] exquisite corpse?
   - [ ] symmetric pixel editing?

@@ -63,7 +63,7 @@ export class Game {
 
       // set up new controller
       this.globalInput.setController(
-        new PlacementController(state, () => {
+        new PlacementController(this, () => {
           this.ui.setDialog(EpitaphDialog, {
             onPost: (text: string) => {
               const newPlot = state.placePlot(text);
@@ -79,7 +79,7 @@ export class Game {
       );
     } else {
       this.globalInput.setController(
-        new ExplorationController(state, null),
+        new ExplorationController(this, null),
         adaptBrowserController,
       );
       this.world.removeChild(state.futurePlot.graphic.mesh);

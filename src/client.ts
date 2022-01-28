@@ -91,7 +91,7 @@ async function main(): Promise<void> {
   //Controls.init(state, socket);
   const globalInput = new GlobalInput();
   globalInput.setController(
-    new ExplorationController(state2, null),
+    new ExplorationController(game, null),
     adaptBrowserController,
   );
 
