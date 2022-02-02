@@ -1,6 +1,4 @@
 import * as PIXI from 'pixi.js';
-import * as React from 'react';
-import {render} from 'react-dom';
 
 import stateJson from './data/state.ts';
 import State from './state2.ts';
@@ -8,22 +6,18 @@ import {loadShaders} from './graphic.ts';
 import View from './view.ts';
 import {
   ExplorationController,
-  PlacementController,
   GlobalInput,
   adaptBrowserController,
 } from './controls.ts';
 import * as ws from './websocket.ts';
 import Pool from './utils/pool.ts';
 import {init as initUi} from './ui.ts';
-import {getGame, setGame, Game} from './game.ts'
-
-import UiApp from './ui/app.tsx';
-import EpitaphDialog from './ui/EpitaphDialog.tsx';
+import {setGame, Game} from './game.ts'
 
 async function main(): Promise<void> {
   await loadShaders();
 
-  let game: Game = new Game();
+  const game: Game = new Game();
   setGame(game);
 
   const state2 = ((window as any).state = await State.fromJSON(stateJson));

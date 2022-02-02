@@ -13,7 +13,7 @@ import {
 import View from './view.ts';
 import EpitaphDialog from './ui/EpitaphDialog.tsx';
 
-let _game;
+let _game: Game;
 
 export function setGame(game: Game) {
   _game = game;

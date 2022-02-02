@@ -1,7 +1,7 @@
 #!/usr/bin/env deno run --allow-all --unstable
 
-import {emptyDir, ensureDir, walk} from 'https://deno.land/std@0.83.0/fs/mod.ts';
-import {dirname, resolve} from 'https://deno.land/std@0.83.0/path/mod.ts';
+import {emptyDir, ensureDir, walk} from 'https://deno.land/std@0.123.0/fs/mod.ts';
+import {dirname, resolve} from 'https://deno.land/std@0.123.0/path/mod.ts';
 
 import {projectRoot} from './common.ts';
 
@@ -40,7 +40,7 @@ async function main() {
   console.log('copying statics');
   for await (const {path} of walk(
     srcDir,
-    {includeDirs: false, skip: [/\.ts$/]},
+    {includeDirs: false, skip: [/\.tsx?$/]},
   )) {
     let promise = copyToBuild(path) ;
     promises.add(promise);
@@ -81,6 +81,7 @@ async function main() {
     cwd: projectRoot,
   });
   */
+ /*
   const process = run({
     cmd: [
       'npm',
@@ -89,6 +90,21 @@ async function main() {
     ],
     cwd: projectRoot,
   });
+	*/
+
+  const process = run({
+		cmd: [
+			'deno',
+			'bundle',
+			'--config',
+			'src/deno.json',
+			'--import-map',
+			'src/import_map.json',
+			'src/client.ts',
+			'build/client.js',
+		],
+		cwd: projectRoot,
+	});
 
   await process.status();
 
