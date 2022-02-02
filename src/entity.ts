@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js';
-import {Vector2} from './utils/point';
-import {doBoxesIntersect} from './utils/box';
-import {Physics, DynamicPhysics, OverlayPhysics} from './physics';
-import ClassParser from './utils/class-parser';
-import {Graphic} from './graphic';
-import State from './state2';
-import {Trigger} from './trigger';
+import {Vector2} from './utils/point.ts';
+import {doBoxesIntersect} from './utils/box.ts';
+import {Physics, DynamicPhysics, OverlayPhysics} from './physics.ts';
+import ClassParser from './utils/class-parser.ts';
+import {Graphic} from './graphic.ts';
+import State from './state2.ts';
+import {Trigger} from './trigger.ts';
 
 export class Entity {
   constructor(

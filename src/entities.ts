@@ -1,4 +1,4 @@
-import {Sprite} from './sprite';
+import {Sprite} from './sprite.ts';
 
 export const entities: Sprite[] = [
   {id: '1', type: 'headstone', x: 200, y: 100, width: 50, height: 50, data: {text: 'Here lies Kyle'}},

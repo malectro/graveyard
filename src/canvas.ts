@@ -1,4 +1,4 @@
-import {createElement} from './utils/dom.js';
+import {createElement} from './utils/dom.ts';
 
 export const canvas: HTMLCanvasElement = createElement(document, 'canvas', {
   width: window.innerWidth,

@@ -1,10 +1,10 @@
-import * as p from './utils/point.js';
-import {intersectSegment} from './utils/box';
-import {Graphic} from './utils/graphic.js';
-import {reduce} from './utils/iterable';
-import {Sprite} from './sprite';
-import {PhysicsBox} from './utils/box';
-import {Entity, PhysicsEntity, Species} from './entity';
+import * as p from './utils/point.ts';
+import {intersectSegment} from './utils/box.ts';
+import {Graphic} from './utils/graphic.ts';
+import {reduce} from './utils/iterable.ts';
+import {Sprite} from './sprite.ts';
+import {PhysicsBox} from './utils/box.ts';
+import {Entity, PhysicsEntity, Species} from './entity.ts';
 
 
 export class HeroSpecies implements Species {

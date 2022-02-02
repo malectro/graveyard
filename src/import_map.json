@@ -1,0 +1,9 @@
+{
+	"imports": {
+		"react": "https://cdn.skypack.dev/react",
+		"react-dom": "https://cdn.skypack.dev/react-dom",
+		"pixi.js": "https://cdn.skypack.dev/pixi.js",
+		"@emotion/": "https://cdn.skypack.dev/@emotion/",
+		"rxjs": "https://cdn.skypack.dev/rxjs"
+	}
+}

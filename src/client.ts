@@ -2,23 +2,23 @@ import * as PIXI from 'pixi.js';
 import * as React from 'react';
 import {render} from 'react-dom';
 
-import stateJson from './data/state';
-import State from './state2';
-import {loadShaders} from './graphic';
-import View from './view';
+import stateJson from './data/state.ts';
+import State from './state2.ts';
+import {loadShaders} from './graphic.ts';
+import View from './view.ts';
 import {
   ExplorationController,
   PlacementController,
   GlobalInput,
   adaptBrowserController,
-} from './controls';
-import * as ws from './websocket';
-import Pool from './utils/pool';
-import {init as initUi} from './ui';
-import {getGame, setGame, Game} from './game'
+} from './controls.ts';
+import * as ws from './websocket.ts';
+import Pool from './utils/pool.ts';
+import {init as initUi} from './ui.ts';
+import {getGame, setGame, Game} from './game.ts'
 
-import UiApp from './ui/app';
-import EpitaphDialog from './ui/EpitaphDialog';
+import UiApp from './ui/app.tsx';
+import EpitaphDialog from './ui/EpitaphDialog.tsx';
 
 async function main(): Promise<void> {
   await loadShaders();

@@ -1,7 +1,7 @@
-import * as p from './utils/point.js';
-import * as Hero from './hero.js';
-import * as Headstone from './headstone.js';
-import {Sprite} from './sprite.js';
+import * as p from './utils/point.ts';
+import * as Hero from './hero.ts';
+import * as Headstone from './headstone.ts';
+import {Sprite} from './sprite.ts';
 
 interface WebSocketMessageSimple<T extends string> {
   type: T;

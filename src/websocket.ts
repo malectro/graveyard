@@ -1,9 +1,9 @@
 import * as rxjs from 'rxjs';
 
-import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.js';
-import * as p from './utils/point.js';
-import {State} from './state.js';
-import View from './view.js';
+import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.ts';
+import * as p from './utils/point.ts';
+import {State} from './state.ts';
+import View from './view.ts';
 
 export interface Socket {
   ws: WebSocket;

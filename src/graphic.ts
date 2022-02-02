@@ -1,9 +1,9 @@
 import * as PIXI from 'pixi.js';
-import {Vector2} from './utils/point';
-import Pool from './utils/pool';
-import Cache from './utils/cache';
-import {scale} from './utils/array';
-import {Physics} from './physics';
+import {Vector2} from './utils/point.ts';
+import Pool from './utils/pool.ts';
+import Cache from './utils/cache.ts';
+import {scale} from './utils/array.ts';
+import {Physics} from './physics.ts';
 
 export interface Graphic {
   id: string;

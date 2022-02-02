@@ -1,4 +1,4 @@
-import * as p from './point';
+import * as p from './point.ts';
 
 export interface Box {
   position: p.Vector2;

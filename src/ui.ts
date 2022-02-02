@@ -5,10 +5,10 @@ import {
   PlacementController,
   GlobalInput,
   adaptBrowserController,
-} from './controls';
+} from './controls.ts';
 
-import UiApp from './ui/app';
-import EpitaphDialog from './ui/EpitaphDialog';
+import UiApp from './ui/app.tsx';
+import EpitaphDialog from './ui/EpitaphDialog.tsx';
 
 export interface UI {
   render: () => void;

@@ -1,5 +1,5 @@
-import * as p from './utils/point.js';
-import {Graphic} from './utils/graphic.js';
+import * as p from './utils/point.ts';
+import {Graphic} from './utils/graphic.ts';
 
 
 export interface Sprite extends p.Point, Graphic {

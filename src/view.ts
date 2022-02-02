@@ -1,4 +1,4 @@
-import * as PointMath from './utils/point.js';
+import * as PointMath from './utils/point.ts';
 
 type PixiApp = any;
 

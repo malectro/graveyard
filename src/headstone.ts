@@ -1,5 +1,5 @@
-import * as Sprite from './sprite.js';
-import {Species} from './entity';
+import * as Sprite from './sprite.ts';
+import {Species} from './entity.ts';
 
 export interface Type extends Sprite.Sprite {
   type: 'headstone';

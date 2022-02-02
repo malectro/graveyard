@@ -1,4 +1,6 @@
 ## todo
+- [ ] tooling
+  - [ ] see about bundling with deno?
 - [ ] create tombstone creation flow
   - [x] map should follow future tombstone
   - [x] allow moving future plot with mouse

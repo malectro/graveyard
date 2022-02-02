@@ -1,17 +1,17 @@
 import * as PIXI from 'pixi.js';
-import State from './state2';
-import {UI} from './ui';
-import {Entity} from './entity';
-import {DynamicPhysics, StaticPhysics, OverlayPhysics} from './physics';
-import {AnimatedGraphic, StaticGraphic} from './graphic';
+import State from './state2.ts';
+import {UI} from './ui.ts';
+import {Entity} from './entity.ts';
+import {DynamicPhysics, StaticPhysics, OverlayPhysics} from './physics.ts';
+import {AnimatedGraphic, StaticGraphic} from './graphic.ts';
 import {
   ExplorationController,
   PlacementController,
   GlobalInput,
   adaptBrowserController,
-} from './controls';
-import View from './view';
-import EpitaphDialog from './ui/EpitaphDialog';
+} from './controls.ts';
+import View from './view.ts';
+import EpitaphDialog from './ui/EpitaphDialog.tsx';
 
 let _game;
 

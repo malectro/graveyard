@@ -1,4 +1,4 @@
-import ClassParser, {Parser} from './class-parser';
+import ClassParser, {Parser} from './class-parser.ts';
 
 
 export interface Identified {

@@ -1,14 +1,14 @@
-import * as Hero from './hero.js';
-import {Asset} from './graphic';
-import {Entity, PhysicsEntity, Species} from './entity';
-import {DynamicPhysics, StaticPhysics, OverlayPhysics} from './physics';
-import {AnimatedGraphic, StaticGraphic} from './graphic';
-import {HeroSpecies} from './hero';
-import ClassParser, {Parser} from './utils/class-parser';
-import {Trigger} from './trigger';
-import {IdMap} from './utils/id-map';
-import {newId} from './utils/id';
-import * as p from './utils/point';
+import * as Hero from './hero.ts';
+import {Asset} from './graphic.ts';
+import {Entity, PhysicsEntity, Species} from './entity.ts';
+import {DynamicPhysics, StaticPhysics, OverlayPhysics} from './physics.ts';
+import {AnimatedGraphic, StaticGraphic} from './graphic.ts';
+import {HeroSpecies} from './hero.ts';
+import ClassParser, {Parser} from './utils/class-parser.ts';
+import {Trigger} from './trigger.ts';
+import {IdMap} from './utils/id-map.ts';
+import {newId} from './utils/id.ts';
+import * as p from './utils/point.ts';
 
 export default class State {
   // persistent data

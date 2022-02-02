@@ -1,6 +1,6 @@
-import * as Hero from './hero.js';
-import * as Headstone from './headstone.js';
-import {Sprite} from './sprite.js';
+import * as Hero from './hero.ts';
+import * as Headstone from './headstone.ts';
+import {Sprite} from './sprite.ts';
 
 export interface State {
   hero: Hero.HeroType, 

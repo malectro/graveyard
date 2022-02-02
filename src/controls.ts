@@ -1,8 +1,8 @@
-import * as PointMath from './utils/point';
-import * as Hero from './hero';
-import {Socket, sendMessage} from './websocket';
-import State from './state2';
-import {Game} from './game';
+import * as PointMath from './utils/point.ts';
+import * as Hero from './hero.ts';
+import {Socket, sendMessage} from './websocket.ts';
+import State from './state2.ts';
+import {Game} from './game.ts';
 
 export function adaptBrowserController(
   controller: Controller,

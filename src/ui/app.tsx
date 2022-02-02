@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {Button} from './button';
 import {css} from '@emotion/css';
 import styled from '@emotion/styled';
+import {Button} from './button.tsx';
 
 export default function UiApp({game, mode, onModeChange}): React.ReactNode {
   const {dialog} = game.state;

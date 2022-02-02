@@ -1,4 +1,4 @@
-import {canvas} from './canvas.js';
+import {canvas} from './canvas.ts';
 
 
 const ctx = canvas.getContext('webgl');

@@ -1,8 +1,8 @@
-import * as p from './utils/point';
-import {Box, createBox, copy, setOffset, doBoxesIntersect} from './utils/box';
-import {Entity} from './entity';
-import {getGame} from './game';
-import AlertDialog from './ui/AlertDialog';
+import * as p from './utils/point.ts';
+import {Box, createBox, copy, setOffset, doBoxesIntersect} from './utils/box.ts';
+import {Entity} from './entity.ts';
+import {getGame} from './game.ts';
+import AlertDialog from './ui/AlertDialog.tsx';
 
 
 export class Trigger {

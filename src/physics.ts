@@ -1,9 +1,9 @@
-import {reduce} from './utils/iterable';
-import * as p from './utils/point';
-import {PhysicsBox, Box, intersectSegment, doBoxesIntersect} from './utils/box';
-import {Entity} from './entity';
-import Component from './component';
-import State from './state2';
+import {reduce} from './utils/iterable.ts';
+import * as p from './utils/point.ts';
+import {PhysicsBox, Box, intersectSegment, doBoxesIntersect} from './utils/box.ts';
+import {Entity} from './entity.ts';
+import Component from './component.ts';
+import State from './state2.ts';
 
 export interface Physics extends Component, Box {}
 
