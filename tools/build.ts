@@ -19,8 +19,8 @@ console.log('srcDir', srcDir);
 
 async function main() {
   console.log('building to', buildDir);
-  ensureDir(buildDir);
-  emptyDir(buildDir);
+  await ensureDir(buildDir);
+  await emptyDir(buildDir);
 
   let promises = new Set();
 
@@ -100,6 +100,7 @@ async function main() {
 			'src/deno.json',
 			'--import-map',
 			'src/import_map.json',
+			'--no-check',
 			'src/client.ts',
 			'build/client.js',
 		],
