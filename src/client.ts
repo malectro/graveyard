@@ -80,12 +80,12 @@ async function main(): Promise<void> {
        */
   });
 
-  // TODO (kyle): use websocket
-  //const socket = ws.start('localhost:8030', state, view);
+  const socket = ws.start('localhost:8030', state2, view);
   //Controls.init(state, socket);
+	
   const globalInput = new GlobalInput();
   globalInput.setController(
-    new ExplorationController(game, null),
+    new ExplorationController(game, socket),
     adaptBrowserController,
   );
 

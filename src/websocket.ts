@@ -2,7 +2,7 @@ import * as rxjs from 'rxjs';
 
 import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.ts';
 import * as p from './utils/point.ts';
-import {State} from './state.ts';
+import State from './state2.ts';
 import View from './view.ts';
 
 export interface Socket {
@@ -11,7 +11,7 @@ export interface Socket {
 }
 
 export function start(domain: string, state: State, view: View): Socket {
-  const socket = {
+  const socket: Socket = {
     ws: null,
     domain,
   };
@@ -41,7 +41,7 @@ export function start(domain: string, state: State, view: View): Socket {
 
       try {
         message = <WebSocketOutgoingMessage>JSON.parse(event.data); 
-      } catch (error) {
+      } catch (_error) {
         console.log('got un-parsable message', event);
         return;
       }

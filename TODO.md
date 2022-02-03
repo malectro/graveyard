@@ -1,6 +1,4 @@
 ## todo
-- [ ] tooling
-  - [ ] see about bundling with deno?
 - [ ] create tombstone creation flow
   - [x] map should follow future tombstone
   - [x] allow moving future plot with mouse
@@ -10,6 +8,10 @@
   - [ ] design some tombstones
 - [ ] save tombstones to db
   - [ ] db service?
+- [ ] state cleanup
+  - [ ] separate UI state from map state
+  - [ ] tombstone text should be a separate component (not species) 
+	- [ ] entities should have a list of components?
 - [ ] stream entities/map from db
   - [ ] stream entities based on location
 - [ ] environment
@@ -18,6 +20,8 @@
 - [ ] navigation
   - [ ] design player characters
   - [ ] players that have created tombstones are ghosts
+- [ ] tooling
+  - [x] see about bundling with deno?
 - [ ] spritesheet?
 - [ ] entities need layering or z-index
 
