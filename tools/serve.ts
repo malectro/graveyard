@@ -1,6 +1,6 @@
 #!/usr/bin/env deno run --allow-run
 
-import {dirname, resolve} from 'https://deno.land/std@0.123.0/path/mod.ts';
+import {resolve} from 'https://deno.land/std@0.123.0/path/mod.ts';
 
 import {buildDir} from './common.ts';
 

@@ -1,5 +1,6 @@
 {
 	"imports": {
+		"knex": "https://cdn.skypack.dev/knex",
 		"deno_server": "https://deno.land/std@v0.6.0/http/server.ts"
 	}
 }
