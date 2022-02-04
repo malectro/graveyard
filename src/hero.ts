@@ -1,10 +1,7 @@
 import * as p from './utils/point.ts';
-import {intersectSegment} from './utils/box.ts';
-import {Graphic} from './utils/graphic.ts';
-import {reduce} from './utils/iterable.ts';
-import {Sprite} from './sprite.ts';
+import {HeroType} from './hero.type.ts';
 import {PhysicsBox} from './utils/box.ts';
-import {Entity, PhysicsEntity, Species} from './entity.ts';
+import {PhysicsEntity, Species} from './entity.ts';
 
 
 export class HeroSpecies implements Species {
@@ -26,18 +23,6 @@ export class Hero {
     if (lastHitEntity) {
     }
   }
-}
-
-export interface HeroType extends p.Point, Graphic {
-  id: string;
-  name: string;
-  speed: number;
-  friction: number;
-  acceleration: p.Point;
-  direction: p.Point;
-  velocity: p.Point;
-  futurePosition: p.Point;
-  lastUpdate: number;
 }
 
 export function create(): HeroType {

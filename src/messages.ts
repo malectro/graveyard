@@ -1,7 +1,4 @@
 import * as p from './utils/point.ts';
-import * as Hero from './hero.ts';
-import * as Headstone from './headstone.ts';
-import {Sprite} from './sprite.ts';
 
 interface WebSocketMessageSimple<T extends string> {
   type: T;
@@ -24,10 +21,10 @@ export type WebSocketIncomingMessage =
 
 export type HeroLocationMessage = WebSocketMessage<
   'hero/location',
-  Hero.HeroType
+	null
 >;
 export type HeroViewMessage = WebSocketMessage<
   'hero/view',
-  {hero: Hero.HeroType; sprites: Sprite[]}
+	null
 >;
 export type WebSocketOutgoingMessage = HeroLocationMessage | HeroViewMessage;

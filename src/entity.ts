@@ -1,4 +1,3 @@
-import * as PIXI from 'pixi.js';
 import {Vector2} from './utils/point.ts';
 import {doBoxesIntersect} from './utils/box.ts';
 import {Physics, DynamicPhysics, OverlayPhysics} from './physics.ts';

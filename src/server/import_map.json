@@ -1,6 +1,8 @@
 {
 	"imports": {
-		"knex": "https://cdn.skypack.dev/knex",
-		"deno_server": "https://deno.land/std@v0.6.0/http/server.ts"
+		"denodb": "https://deno.land/x/denodb/mod.ts",
+		"pixi.js": "https://cdn.skypack.dev/pixi.js",
+		"rxjs": "https://cdn.skypack.dev/rxjs",
+		"deno_server": "https://deno.land/std@v0.124.0/http/server.ts"
 	}
 }

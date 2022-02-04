@@ -1,7 +1,6 @@
 import * as rxjs from 'rxjs';
 
 import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.ts';
-import * as p from './utils/point.ts';
 import State from './state2.ts';
 import View from './view.ts';
 
@@ -48,24 +47,19 @@ export function start(domain: string, state: State, view: View): Socket {
 
       switch (message.type) {
         case 'hero/view': {
-          const {sprites, hero} = message.payload;
-          for (const sprite of sprites) {
-            if (!state.sprites.has(sprite.id)) {
-              state.sprites.set(sprite.id, sprite);
-            }
-          }
-          //state.hero = hero;
+					console.log('got message', message.payload);
         }
       }
     });
 
     const viewPingInterval = 1000;
-    let getViewTimeoutId;
+    let getViewTimeoutId = 0;
 
     function getView() {
       if (!document.hidden && socket.ws.readyState === WebSocket.OPEN) {
         sendMessage(socket, {type: 'hero/getView', payload: view.getViewBox()});
-        getViewTimeoutId = setTimeout(getView, viewPingInterval);
+				// TODO (kyle): don't repeatedly ping for now until we have multiplayer
+        //getViewTimeoutId = setTimeout(getView, viewPingInterval);
       }
     }
 

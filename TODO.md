@@ -9,6 +9,7 @@
 - [ ] save tombstones to db
   - [ ] db service?
 - [ ] state cleanup
+  - [ ] Trigger data should be free of UI functionality (so that it can exist on the server in a more clean way)
   - [ ] separate UI state from map state
   - [ ] tombstone text should be a separate component (not species) 
 	- [ ] entities should have a list of components?
