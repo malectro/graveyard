@@ -2,6 +2,8 @@
 - [ ] create tombstone creation flow
   - [x] map should follow future tombstone
   - [x] allow moving future plot with mouse
+	- [ ] should create an entity in the db
+	  - post new message type to websocket
   - [ ] add sidebar
   - [ ] exquisite corpse?
   - [ ] symmetric pixel editing?
@@ -23,6 +25,7 @@
   - [ ] players that have created tombstones are ghosts
 - [ ] tooling
   - [x] see about bundling with deno?
+- [ ] controller support?
 - [ ] spritesheet?
 - [ ] entities need layering or z-index
 

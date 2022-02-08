@@ -12,6 +12,7 @@ import {
 } from './controls.ts';
 import View from './view.ts';
 import EpitaphDialog from './ui/EpitaphDialog.tsx';
+import {Socket, sendMessage} from './websocket.ts'; 
 
 let _game: Game;
 
@@ -30,6 +31,7 @@ export class Game {
   view: View;
   globalInput: GlobalInput;
   ui: UI;
+	socket: Socket;
 
   setMode(mode: 'play' | 'edit') {
     const {state} = this;
@@ -71,6 +73,12 @@ export class Game {
                 this.world.addChild(newPlot.graphic.mesh);
                 this.world.addChild(state.futurePlot.graphic.mesh);
                 this.setMode('play');
+								sendMessage(this.socket, {
+									type: 'headstone/create',
+									payload: {
+										text,
+									},
+								});
               }
             },
           });

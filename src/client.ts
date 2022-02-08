@@ -81,6 +81,7 @@ async function main(): Promise<void> {
   });
 
   const socket = ws.start('localhost:8030', state2, view);
+	game.socket = socket;
   //Controls.init(state, socket);
 	
   const globalInput = new GlobalInput();

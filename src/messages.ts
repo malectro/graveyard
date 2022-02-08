@@ -14,10 +14,14 @@ export type HeroGetViewMessage = WebSocketMessage<'hero/getView', {
   position: p.Point;
   size: p.Point;
 }>;
+export type HeadstoneCreateMessage = WebSocketMessage<'headstone/create', {
+	text: string,
+}>;
 export type WebSocketIncomingMessage =
   | HeroAppearMessage
   | HeroMoveMessage
-  | HeroGetViewMessage;
+  | HeroGetViewMessage
+	| HeadstoneCreateMessage;
 
 export type HeroLocationMessage = WebSocketMessage<
   'hero/location',

@@ -1,3 +1,4 @@
+import * as PIXI from 'pixi.js';
 import {reduce} from './utils/iterable.ts';
 import * as p from './utils/point.ts';
 import {PhysicsBox, Box, intersectSegment, doBoxesIntersect} from './utils/box.ts';
