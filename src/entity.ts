@@ -12,6 +12,8 @@ export class Entity {
     public species: Species,
     public trigger?: Trigger,
   ) {
+    this.graphic.mesh.name = this.id;
+
     // TODO (kyle): generic components
     if (trigger) {
       trigger.parent = this;
@@ -51,11 +53,14 @@ export class Entity {
   tick(state: State, now: number, delta: number): void {
     // TODO (kyle): maybe use dirty property to only update stuff that needs updating?
     this.box.tick(state, now, delta);
+    if (this.box instanceof DynamicPhysics) {
+      state.entities.updatePosition(this);
+    }
     this.graphic.update(this.box);
   }
 
   activateNearbyEntity(state: State): void {
-    for (const entity of state.entities.values()) {
+    for (const entity of state.entities.entitiesNear(this.box.position)) {
       if (entity !== this && entity.trigger && entity.trigger.canActivate(this)) {
         entity.trigger.activate();
       }

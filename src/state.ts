@@ -5,13 +5,14 @@ import {AnimatedGraphic, StaticGraphic} from './graphic';
 import ClassParser, {Parser} from './utils/class-parser';
 import {Trigger} from './trigger';
 import {IdMap} from './utils/id-map';
+import {ChunkMap} from './chunk-map';
 import {newId} from './utils/id';
 import * as p from './utils/point';
 
 export default class State {
   // persistent data
   hero: PhysicsEntity;
-  entities: IdMap<Entity>;
+  entities: ChunkMap;
   assets: IdMap<Asset>;
   species: IdMap<Species>;
   triggers: IdMap<Trigger>;
@@ -42,9 +43,11 @@ export default class State {
       ),
     });
 
-    state.entities = IdMap.fromJSON(
-      json.entities.map(entity => Entity.fromJSON(state, {physics: physicsClassParser, graphic: graphicClassParser}, entity)),
-    );
+    state.entities = new ChunkMap();
+    const entities = json.entities.map(entity => Entity.fromJSON(state, {physics: physicsClassParser, graphic: graphicClassParser}, entity));
+    for (const entity of entities) {
+      state.entities.set(entity.id, entity);
+    }
 
     state.hero = (state.entities.get(json.hero) as PhysicsEntity);
 

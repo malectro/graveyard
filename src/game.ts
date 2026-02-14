@@ -59,7 +59,7 @@ export class Game {
       state.futurePlot.graphic.mesh.alpha = 0.5;
       state.entities.set(state.futurePlot.id, state.futurePlot);
 
-      this.world.addChild(state.futurePlot.graphic.mesh);
+      this.pixi.stage.addChild(state.futurePlot.graphic.mesh);
 
       // set up new controller
       this.globalInput.setController(
@@ -68,8 +68,7 @@ export class Game {
             onPost: (text: string) => {
               const newPlot = state.placePlot(text);
               if (newPlot) {
-                this.world.addChild(newPlot.graphic.mesh);
-                this.world.addChild(state.futurePlot.graphic.mesh);
+                // Game loop will add newPlot mesh on next frame
                 this.setMode('play');
               }
             },
@@ -82,7 +81,7 @@ export class Game {
         new ExplorationController(this),
         adaptBrowserController,
       );
-      this.world.removeChild(state.futurePlot.graphic.mesh);
+      this.pixi.stage.removeChild(state.futurePlot.graphic.mesh);
       state.entities.delete(state.futurePlot.id);
       state.futurePlot = null;
       state.focus = state.hero;

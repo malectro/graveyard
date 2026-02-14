@@ -97,7 +97,7 @@ export class DynamicPhysics implements PhysicsBox, Physics {
   }
 
   adjustForCollisions(state: State) {
-    for (const entity of state.entities.values()) {
+    for (const entity of state.entities.entitiesNear(this.position)) {
       if (entity.box !== this && entity.species.collides && doBoxesIntersect(this, entity.box)) {
         this.lastHitEntity = entity;
 
@@ -147,7 +147,7 @@ export class OverlayPhysics implements Physics {
 
   isColliding(state: State): boolean {
     let collides = false;
-    for (const entity of state.entities.values()) {
+    for (const entity of state.entities.entitiesNear(this.position)) {
       if (entity.box !== this && entity.species.collides && doBoxesIntersect(this, entity.box)) {
         collides = true;
       }

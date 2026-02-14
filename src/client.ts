@@ -38,11 +38,6 @@ async function main(): Promise<void> {
 
   const {hero} = state2;
   state2.focus = hero;
-  for (const entity of state2.entities.values()) {
-    if (entity !== hero) {
-      world.addChild(entity.graphic.mesh);
-    }
-  }
   app.stage.addChild(world);
   app.stage.addChild(hero.graphic.mesh);
 
@@ -52,8 +47,38 @@ async function main(): Promise<void> {
     const now = Date.now();
     const {hero, focus} = state2;
 
-    for (const entity of state2.entities.values()) {
-      entity.tick(state2, now, delta);
+    // Always tick the hero
+    hero.tick(state2, now, delta);
+
+    // Determine visible region
+    const viewBox = view.getViewBox();
+
+    // Track which entity meshes should be visible
+    const visibleIds = new Set<string>();
+    visibleIds.add(hero.id);
+
+    for (const entity of state2.entities.entitiesInBox(viewBox)) {
+      visibleIds.add(entity.id);
+
+      // Add mesh to world if not already present
+      if (!entity.graphic.mesh.parent || entity.graphic.mesh.parent !== world) {
+        if (entity !== hero) {
+          world.addChild(entity.graphic.mesh);
+        }
+      }
+
+      // Tick non-hero entities
+      if (entity !== hero) {
+        entity.tick(state2, now, delta);
+      }
+    }
+
+    // Remove meshes for entities no longer visible
+    for (let i = world.children.length - 1; i >= 0; i--) {
+      const child = world.children[i];
+      if (child.name && !visibleIds.has(child.name)) {
+        world.removeChild(child);
+      }
     }
 
     if (focus != null) {

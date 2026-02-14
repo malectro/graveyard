@@ -20,5 +20,5 @@ the client in some way based on where the user's player character is located.
 ## Development
 Requires `deno` version 2.
 
-Use `deno tools/build.ts` to build the client bundle and `deno tools/serve.ts` to run the
+Use `npm run build` to build the client bundle and `deno tools/serve.ts` to run the
 server.
