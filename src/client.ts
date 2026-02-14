@@ -1,24 +1,16 @@
 import * as PIXI from 'pixi.js';
-import * as React from 'react';
-import {render} from 'react-dom';
 
 import stateJson from './data/state';
-import State from './state2';
+import State from './state';
 import {loadShaders} from './graphic';
 import View from './view';
 import {
   ExplorationController,
-  PlacementController,
   GlobalInput,
   adaptBrowserController,
 } from './controls';
-import * as ws from './websocket';
-import Pool from './utils/pool';
 import {init as initUi} from './ui';
-import {getGame, setGame, Game} from './game'
-
-import UiApp from './ui/app';
-import EpitaphDialog from './ui/EpitaphDialog';
+import {setGame, Game} from './game';
 
 async function main(): Promise<void> {
   await loadShaders();
@@ -26,10 +18,8 @@ async function main(): Promise<void> {
   let game: Game = new Game();
   setGame(game);
 
-  const state2 = ((window as any).state = await State.fromJSON(stateJson));
+  const state2 = await State.fromJSON(stateJson);
   game.state = state2;
-
-  //(<any>window).__state2 = state2;
 
   const app = new PIXI.Application({
     width: window.innerWidth,
@@ -50,7 +40,6 @@ async function main(): Promise<void> {
   state2.focus = hero;
   for (const entity of state2.entities.values()) {
     if (entity !== hero) {
-      console.log('adding', entity, entity.graphic.mesh);
       world.addChild(entity.graphic.mesh);
     }
   }
@@ -63,8 +52,6 @@ async function main(): Promise<void> {
     const now = Date.now();
     const {hero, focus} = state2;
 
-    //hero.tick(state2, now, delta);
-
     for (const entity of state2.entities.values()) {
       entity.tick(state2, now, delta);
     }
@@ -73,25 +60,11 @@ async function main(): Promise<void> {
       view.focusCamera(focus.box.position);
     }
 
-    /*
-    for (const [id, entity] of entities) {
-      // cull
-      if (!view.isInLoadRange(sprite)) {
-        console.log('culling', sprite.id);
-        world.removeChild(sprite.mesh);
-        headstoneMeshPool.retire(sprite.mesh);
-        state.sprites.delete(sprite.id);
-      }
-    }
-       */
   });
 
-  // TODO (kyle): use websocket
-  //const socket = ws.start('localhost:8030', state, view);
-  //Controls.init(state, socket);
   const globalInput = new GlobalInput();
   globalInput.setController(
-    new ExplorationController(game, null),
+    new ExplorationController(game),
     adaptBrowserController,
   );
 
@@ -101,12 +74,3 @@ async function main(): Promise<void> {
 }
 
 main();
-
-/*
-window.addEventListener('resize', () => {
-  Object.assign(canvas, {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-});
-*/

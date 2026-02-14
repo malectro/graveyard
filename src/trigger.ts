@@ -33,7 +33,6 @@ export class Trigger {
   canActivate(entity: Entity): boolean {
     const realBox = copy(this.box);
     setOffset(realBox, this.parent.box.position);
-    console.log('can activate?', entity.box, this.box, realBox);
     return doBoxesIntersect(entity.box, realBox);
   }
 }

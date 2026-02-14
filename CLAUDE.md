@@ -34,7 +34,7 @@ ECS-inspired component system. Each entity has:
 |------|---------|
 | `src/client.ts` | Client entry point, game loop (Pixi ticker) |
 | `src/game.ts` | Game class, central coordinator |
-| `src/state2.ts` | Game state: entities, hero, mode, assets, species |
+| `src/state.ts` | Game state: entities, hero, mode, assets, species |
 | `src/entity.ts` | Entity definition and deserialization |
 | `src/physics.ts` | StaticPhysics / DynamicPhysics (velocity, collision) |
 | `src/graphic.ts` | StaticGraphic / AnimatedGraphic (sprite rendering) |

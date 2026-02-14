@@ -39,17 +39,6 @@ export function doBoxesIntersect(box1: Box, box2: Box): boolean {
       box1.position.y + box1.size.y > box2.position.y
     )
   );
-
-  return (
-    (box1.position.x > box2.position.x &&
-      box1.position.x < box2.position.x + box2.size.x &&
-      box1.position.y > box2.position.y &&
-      box1.position.y < box2.position.y + box2.size.y) ||
-    (box2.position.x > box1.position.x &&
-      box2.position.x < box1.position.x + box1.size.x &&
-      box2.position.y > box1.position.y &&
-      box2.position.y < box1.position.y + box1.size.y)
-  );
 }
 
 export function intersectSegment(
@@ -59,8 +48,8 @@ export function intersectSegment(
 ): null | p.Point {
   const {position, size} = box;
 
-  const bottom = position.y + size.x;
-  const right = position.x + size.y;
+  const bottom = position.y + size.y;
+  const right = position.x + size.x;
 
   const topLeft = box;
   const bottomLeft = p.create(position.x, bottom);

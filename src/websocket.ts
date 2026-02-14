@@ -2,7 +2,7 @@ import * as rxjs from 'rxjs';
 
 import {WebSocketOutgoingMessage, WebSocketIncomingMessage} from './messages.js';
 import * as p from './utils/point.js';
-import {State} from './state.js';
+import {State} from './state.old.js';
 import View from './view.js';
 
 export interface Socket {

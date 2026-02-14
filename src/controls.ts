@@ -1,14 +1,11 @@
 import * as PointMath from './utils/point';
 import * as Hero from './hero';
-import {Socket, sendMessage} from './websocket';
-import State from './state2';
 import {Game} from './game';
 
 export function adaptBrowserController(
   controller: Controller,
   adapter = browserExplorationAdapter,
 ) {
-  //const controller = new ExplorationController(state);
   const currentKeys = new Set();
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -74,7 +71,6 @@ export function adaptBrowserController(
   };
 }
 
-type Direction = 'down' | 'up' | 'left' | 'right';
 interface Controller {}
 
 export class ExplorationController {
@@ -85,7 +81,7 @@ export class ExplorationController {
     left: {x: -1, y: 0},
   };
 
-  constructor(private game: Game, private socket: Socket) {}
+  constructor(private game: Game) {}
 
   direction(buttonOn: boolean, direction) {
     const vector = ExplorationController.directions[direction];
@@ -104,15 +100,6 @@ export class ExplorationController {
   resolveVelocity() {
     this.game.state.hero.box.lastUpdate = Date.now();
     Hero.resolveVelocity(this.game.state.hero.box);
-
-    /*
-    if (this.socket) {
-      sendMessage(this.socket, {
-        type: 'hero/move',
-        payload: state.hero.box.direction,
-      });
-    }
-    */
   }
 }
 
@@ -138,7 +125,6 @@ export class PlacementController {
 
   direction(buttonOn: boolean, direction) {
     const vector = ExplorationController.directions[direction];
-    console.log('moving', vector, buttonOn);
     if (buttonOn) {
       PointMath.add(
         this.game.state.futurePlot.box.position,
@@ -151,8 +137,6 @@ export class PlacementController {
     if (buttonOn) {
       this.onPlace();
     }
-    // TODO (kyle): place the tombstone
-    //this.state.futurePlot.place(this.state);
   }
 
   move(x, y) {

@@ -1,19 +1,102 @@
-import * as Hero from './hero.js';
-import * as Headstone from './headstone.js';
-import {Sprite} from './sprite.js';
+import {Asset} from './graphic';
+import {Entity, PhysicsEntity, Species} from './entity';
+import {DynamicPhysics, StaticPhysics, OverlayPhysics} from './physics';
+import {AnimatedGraphic, StaticGraphic} from './graphic';
+import ClassParser, {Parser} from './utils/class-parser';
+import {Trigger} from './trigger';
+import {IdMap} from './utils/id-map';
+import {newId} from './utils/id';
+import * as p from './utils/point';
 
-export interface State {
-  hero: Hero.HeroType, 
-  headstones: Map<string, Headstone.Type>,
-  sprites: Map<string, Sprite>,
+export default class State {
+  // persistent data
+  hero: PhysicsEntity;
+  entities: IdMap<Entity>;
+  assets: IdMap<Asset>;
+  species: IdMap<Species>;
+  triggers: IdMap<Trigger>;
+
+  // ephemeral ui data
+  focus: Entity | null;
+  mode: 'play' | 'edit';
+  futurePlot: Entity;
+  dialog: React.ReactNode | null = null;
+
+  static async fromJSON(json): Promise<State> {
+    const physicsClassParser = new ClassParser([StaticPhysics, DynamicPhysics]);
+    const graphicClassParser = new ClassParser([AnimatedGraphic, StaticGraphic]);
+
+    const images = await Promise.all(
+      json.assets.map(
+        asset => Array.isArray(asset.src) ? Promise.all(asset.src.map(loadImage)) : loadImage(asset.src),
+      ),
+    ).catch(error => {
+      console.error(error);
+    });
+
+    const state = Object.assign(new State(), {
+      assets: IdMap.fromJSON(json.assets),
+      species: IdMap.fromJSON(json.species),
+      triggers: IdMap.fromJSON(
+        json.triggers.map(trigger => Trigger.fromJSON(trigger)),
+      ),
+    });
+
+    state.entities = IdMap.fromJSON(
+      json.entities.map(entity => Entity.fromJSON(state, {physics: physicsClassParser, graphic: graphicClassParser}, entity)),
+    );
+
+    state.hero = (state.entities.get(json.hero) as PhysicsEntity);
+
+    return state;
+  }
+
+  createSpecies(props): Species {
+    const species = {
+      id: newId(),
+      ...props,
+    };
+
+    this.species.set(species.id, species);
+
+    return species;
+  }
+
+  placePlot(text: string): Entity | undefined {
+    const {box} = this.futurePlot;
+    if (box instanceof OverlayPhysics && box.isColliding(this)) {
+      return;
+    }
+
+    const newPlot = new Entity(
+      newId(),
+      new StaticPhysics(
+        p.copy(box.position),
+        p.copy(box.size),
+      ),
+      this.futurePlot.graphic.copy(),
+      // TODO (kyle): are species right for collision?
+      this.createSpecies({
+        collides: true,
+        triggers: true,
+        text,
+      }),
+      Trigger.fromJSON(this.triggers.get('1').toJSON()),
+    );
+
+    this.entities.set(newPlot.id, newPlot);
+
+    return newPlot;
+  }
 }
 
-function create(): State {
-  return {
-    hero: Hero.create(),
-    headstones: new Map(),
-    sprites: new Map(),
-  };
-}
+function loadImage(src: string): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
 
-export default create;
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', reject);
+
+    image.src = `assets/${src}`;
+  });
+}

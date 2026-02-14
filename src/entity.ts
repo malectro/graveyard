@@ -1,10 +1,7 @@
-import * as PIXI from 'pixi.js';
-import {Vector2} from './utils/point';
-import {doBoxesIntersect} from './utils/box';
 import {Physics, DynamicPhysics, OverlayPhysics} from './physics';
 import ClassParser from './utils/class-parser';
 import {Graphic} from './graphic';
-import State from './state2';
+import State from './state';
 import {Trigger} from './trigger';
 
 export class Entity {
@@ -55,8 +52,6 @@ export class Entity {
     // TODO (kyle): maybe use dirty property to only update stuff that needs updating?
     this.box.tick(state, now, delta);
     this.graphic.update(this.box);
-    //this.graphic.mesh.position.set(this.box.position.x, this.box.position.y);
-    //this.graphic.mesh.position.set(this.box.position.x + this.box.halfSize.x, this.box.position.y + this.box.halfSize.y);
   }
 
   activateNearbyEntity(state: State): void {

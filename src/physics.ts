@@ -1,18 +1,13 @@
-import {reduce} from './utils/iterable';
 import * as p from './utils/point';
-import {PhysicsBox, Box, intersectSegment, doBoxesIntersect} from './utils/box';
+import {PhysicsBox, Box, doBoxesIntersect} from './utils/box';
 import {Entity} from './entity';
 import Component from './component';
-import State from './state2';
+import State from './state';
 
 export interface Physics extends Component, Box {}
 
 export class StaticPhysics implements Physics {
-  halfSize: p.Vector2;
-
-  constructor(public position: p.Vector2, public size: p.Vector2) {
-    this.halfSize = p.scale(p.copy(this.size), 0.5);
-  }
+  constructor(public position: p.Vector2, public size: p.Vector2) {}
 
   static fromJSON(json: any): StaticPhysics {
     const physics = new this(json.position, json.size);
@@ -27,7 +22,6 @@ export class StaticPhysics implements Physics {
 export class DynamicPhysics implements PhysicsBox, Physics {
   position: p.Vector2;
   size: p.Vector2;
-  halfSize: p.Vector2;
   speed = 0;
   friction = 1;
   facing: p.Vector2 = p.point();
@@ -36,12 +30,10 @@ export class DynamicPhysics implements PhysicsBox, Physics {
   velocity: p.Vector2 = p.point();
   futurePosition: p.Vector2 = p.point();
   lastUpdate = 0;
-  // TODO (kyle): possible memory leak
   lastHitEntity: Entity | null = null;
 
   constructor(box: Partial<PhysicsBox>) {
     Object.assign(this, box);
-    this.halfSize = p.scale(p.copy(this.size), 0.5);
   }
 
   static fromJSON(json: any): DynamicPhysics {
@@ -71,7 +63,6 @@ export class DynamicPhysics implements PhysicsBox, Physics {
 
   move(state: State, now: number, delta: number): void {
     const duration = delta;
-    //const duration = now - this.lastUpdate;
 
     // acceleration
     p.add(
@@ -102,8 +93,6 @@ export class DynamicPhysics implements PhysicsBox, Physics {
       p.set(this.facing, this.direction);
     }
 
-    //p.set(this.position, this.futurePosition);
-
     this.lastUpdate = now;
   }
 
@@ -130,19 +119,6 @@ export class DynamicPhysics implements PhysicsBox, Physics {
         } else {
           this.position.y -= adjustment.y;
         }
-        /*
-        if (this.velocity.x === 0) {
-          this.position.y -= adjustment.y;
-        } else if (this.velocity.y === 0) {
-          this.position.x -= adjustment.x;
-        } else {
-          adjustment.x = adjustment.x / this.velocity.x;
-          adjustment.y = adjustment.y / this.velocity.y;
-          const adjustmentValue = Math.min(adjustment.x, adjustment.y);
-          this.position.x -= this.velocity.x * adjustmentValue;
-          this.position.y -= this.velocity.y * adjustmentValue;
-        }
-        */
       }
     }
   }
@@ -152,12 +128,10 @@ export class OverlayPhysics implements Physics {
   entity: Entity;
   position: p.Vector2;
   size: p.Vector2;
-  halfSize: p.Vector2;
 
   constructor(position: p.Vector2, size: p.Vector2) {
     this.position = position;
     this.size = size;
-    this.halfSize = p.scale(p.copy(this.size), 0.5);
   }
 
   tick(state: State, now: number, _delta: number): void {

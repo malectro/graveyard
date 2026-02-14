@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import State from './state2';
+import State from './state';
 import {UI} from './ui';
 import {Entity} from './entity';
 import {DynamicPhysics, StaticPhysics, OverlayPhysics} from './physics';
@@ -79,7 +79,7 @@ export class Game {
       );
     } else {
       this.globalInput.setController(
-        new ExplorationController(this, null),
+        new ExplorationController(this),
         adaptBrowserController,
       );
       this.world.removeChild(state.futurePlot.graphic.mesh);
