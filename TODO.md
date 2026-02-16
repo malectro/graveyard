@@ -6,13 +6,14 @@
   - [ ] exquisite corpse?
   - [ ] symmetric pixel editing?
   - [ ] design some tombstones
-- [ ] save tombstones to db
-  - [ ] db service?
-- [ ] stream entities/map from db
-  - [ ] stream entities based on location
+- [x] save tombstones to db
+  - [x] db service?
+- [x] stream entities/map from db
+  - [x] stream entities based on location
 - [ ] environment
   - [ ] some sort of procedural generation of foliage?
   - [ ] admin foliage editor?
+  - [ ] terrain (tileset or regular?)
 - [ ] navigation
   - [ ] design player characters
   - [ ] players that have created tombstones are ghosts

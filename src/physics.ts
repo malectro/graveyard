@@ -136,8 +136,7 @@ export class OverlayPhysics implements Physics {
 
   tick(state: State, now: number, _delta: number): void {
     if (this.entity.graphic.mesh instanceof PIXI.Sprite) {
-      // TODO (kyle): not sure physics should be in charge of this.
-      if (this.isColliding(state)) {
+      if (this.isColliding(state) || !state.isInsideCluster(this.position)) {
         this.entity.graphic.mesh.tint = 0xff0000;
       } else {
         this.entity.graphic.mesh.tint = 0xffffff;
