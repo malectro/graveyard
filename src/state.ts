@@ -8,6 +8,7 @@ import {IdMap} from './utils/id-map';
 import {ChunkMap} from './chunk-map';
 import {newId} from './utils/id';
 import * as p from './utils/point';
+import {TombstoneRecord, placeTombstone} from './api';
 
 export default class State {
   // persistent data
@@ -65,29 +66,55 @@ export default class State {
     return species;
   }
 
+  createTombstoneEntity(record: TombstoneRecord): Entity {
+    const asset = this.assets.get('1');
+    const graphic = StaticGraphic.fromJSON(asset);
+    const species = this.createSpecies({
+      type: 'headstone',
+      collides: true,
+      triggerable: true,
+      text: record.text,
+    });
+    const trigger = Trigger.fromJSON(this.triggers.get('1').toJSON());
+
+    const entity = new Entity(
+      record.id,
+      new StaticPhysics(
+        {x: record.position.x, y: record.position.y},
+        {x: record.size.x, y: record.size.y},
+      ),
+      graphic,
+      species,
+      trigger,
+    );
+    entity.graphic.mesh.position.set(record.position.x, record.position.y);
+    return entity;
+  }
+
   placePlot(text: string): Entity | undefined {
     const {box} = this.futurePlot;
     if (box instanceof OverlayPhysics && box.isColliding(this)) {
       return;
     }
 
-    const newPlot = new Entity(
-      newId(),
-      new StaticPhysics(
-        p.copy(box.position),
-        p.copy(box.size),
-      ),
-      this.futurePlot.graphic.copy(),
-      // TODO (kyle): are species right for collision?
-      this.createSpecies({
-        collides: true,
-        triggers: true,
-        text,
-      }),
-      Trigger.fromJSON(this.triggers.get('1').toJSON()),
-    );
+    const position = {x: box.position.x, y: box.position.y};
+    const size = {x: box.size.x, y: box.size.y};
+    const tempId = `local_${newId()}`;
 
+    const record: TombstoneRecord = {id: tempId, position, size, text};
+    const newPlot = this.createTombstoneEntity(record);
     this.entities.set(newPlot.id, newPlot);
+
+    // Persist to server
+    placeTombstone(position, text).then(serverRecord => {
+      // Replace local entity with server-assigned ID
+      this.entities.delete(tempId);
+      const serverEntity = this.createTombstoneEntity(serverRecord);
+      this.entities.set(serverEntity.id, serverEntity);
+    }).catch(err => {
+      console.error('Failed to persist tombstone:', err);
+      this.entities.delete(tempId);
+    });
 
     return newPlot;
   }

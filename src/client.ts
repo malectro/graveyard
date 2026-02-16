@@ -11,6 +11,8 @@ import {
 } from './controls';
 import {init as initUi} from './ui';
 import {setGame, Game} from './game';
+import {chunkKeysForBox} from './chunk-map';
+import {fetchChunks} from './api';
 
 async function main(): Promise<void> {
   await loadShaders();
@@ -52,6 +54,33 @@ async function main(): Promise<void> {
 
     // Determine visible region
     const viewBox = view.getViewBox();
+
+    // Load chunks from server as needed
+    const visibleKeys = chunkKeysForBox(viewBox);
+    const unloadedKeys = visibleKeys.filter(
+      k => !state2.entities.isChunkLoaded(k) && !state2.entities.isChunkPending(k),
+    );
+    if (unloadedKeys.length > 0) {
+      for (const k of unloadedKeys) {
+        state2.entities.markChunkPending(k);
+      }
+      fetchChunks(unloadedKeys).then(chunkData => {
+        for (const [key, records] of chunkData) {
+          for (const record of records) {
+            if (!state2.entities.get(record.id)) {
+              const entity = state2.createTombstoneEntity(record);
+              state2.entities.set(entity.id, entity);
+            }
+          }
+          state2.entities.markChunkLoaded(key);
+        }
+      }).catch(err => {
+        console.error('Failed to fetch chunks:', err);
+        for (const k of unloadedKeys) {
+          state2.entities.pendingChunks.delete(k);
+        }
+      });
+    }
 
     // Track which entity meshes should be visible
     const visibleIds = new Set<string>();

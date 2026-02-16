@@ -19,9 +19,43 @@ function entityChunkKey(entity: Entity): string {
   );
 }
 
+export function chunkKeysForBox(box: Box): string[] {
+  const minCx = toChunkCoord(box.position.x);
+  const minCy = toChunkCoord(box.position.y);
+  const maxCx = toChunkCoord(box.position.x + box.size.x);
+  const maxCy = toChunkCoord(box.position.y + box.size.y);
+
+  const keys: string[] = [];
+  for (let cx = minCx; cx <= maxCx; cx++) {
+    for (let cy = minCy; cy <= maxCy; cy++) {
+      keys.push(chunkKey(cx, cy));
+    }
+  }
+  return keys;
+}
+
 export class ChunkMap {
   private chunks: Map<string, Map<string, Entity>> = new Map();
   private entityToChunk: Map<string, string> = new Map();
+  loadedChunks: Set<string> = new Set();
+  pendingChunks: Set<string> = new Set();
+
+  isChunkLoaded(key: string): boolean {
+    return this.loadedChunks.has(key);
+  }
+
+  markChunkLoaded(key: string): void {
+    this.loadedChunks.add(key);
+    this.pendingChunks.delete(key);
+  }
+
+  isChunkPending(key: string): boolean {
+    return this.pendingChunks.has(key);
+  }
+
+  markChunkPending(key: string): void {
+    this.pendingChunks.add(key);
+  }
 
   get(id: string): Entity | undefined {
     const ck = this.entityToChunk.get(id);

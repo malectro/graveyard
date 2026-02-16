@@ -23,76 +23,6 @@ function getAnimatedGraphics(
   return src;
 }
 
-// Generate tombstone entities, species, and grass scattered across the world.
-// Tombstones are spread across many chunks (512px each) to test spatial chunking.
-
-const epitaphs = [
-  'Here lies Kyle',
-  'Gone but not debugged',
-  'Segfault in peace',
-  '404: Life not found',
-  'He mass-assigned his last hash',
-  'Returned void too soon',
-  'Finally free of technical debt',
-  'git commit -m "goodbye"',
-  'She never closed her brackets',
-  'Unreachable code reached',
-  'Stack overflow: too many calls',
-  'He died as he lived: in production',
-  'null pointer to heaven',
-  'Lost in the cloud',
-  'Exited with code 0',
-  'Garbage collected',
-  'Her last words: "it works on my machine"',
-  'Caught the final exception',
-  'Thread terminated',
-  'Memory leak sealed forever',
-  'No more merge conflicts',
-  'Deployed to the great beyond',
-  'while(alive) {} // timeout',
-  'rm -rf /life',
-  'sudo shutdown -h now',
-  'Could not resolve dependency: oxygen',
-  'End of file',
-  'Killed by OOM killer',
-  'Unhandled promise rejection',
-  'Connection reset by reaper',
-];
-
-// Tombstone positions spread across a large area (-2000 to 2000)
-const tombstonePositions = [
-  {x: 200, y: 100},    // original
-  {x: -300, y: -200},
-  {x: 600, y: 400},
-  {x: -800, y: 300},
-  {x: 1000, y: -100},
-  {x: -500, y: -600},
-  {x: 1200, y: 600},
-  {x: -1000, y: 100},
-  {x: 300, y: -500},
-  {x: 800, y: 200},
-  {x: -200, y: 700},
-  {x: 1500, y: -300},
-  {x: -1300, y: -400},
-  {x: 700, y: -700},
-  {x: -600, y: 500},
-  {x: 1800, y: 100},
-  {x: -1500, y: 700},
-  {x: 400, y: 900},
-  {x: -900, y: -800},
-  {x: 1100, y: 800},
-  {x: -1800, y: -100},
-  {x: 1600, y: 500},
-  {x: -400, y: -1000},
-  {x: 900, y: -900},
-  {x: -1100, y: 600},
-  {x: 2000, y: -500},
-  {x: -1600, y: -700},
-  {x: 500, y: 1100},
-  {x: -700, y: 1000},
-  {x: 1400, y: -800},
-];
-
 // Grass positions scattered throughout
 const grassPositions = [
   {x: 400, y: 100}, {x: 500, y: 100},  // originals
@@ -111,30 +41,6 @@ const grassPositions = [
   {x: 1950, y: -200}, {x: -1850, y: -50},
 ];
 
-// Build species: one per tombstone (each has unique epitaph), plus grass and hero
-let nextSpeciesId = 10;
-const tombstoneSpecies = epitaphs.map((text, i) => ({
-  id: String(nextSpeciesId + i),
-  type: 'headstone',
-  collides: true,
-  triggerable: true,
-  text,
-}));
-
-// Build tombstone entities
-let nextEntityId = 100;
-const tombstoneEntities = tombstonePositions.map((pos, i) => ({
-  id: String(nextEntityId + i),
-  box: {
-    className: 'StaticPhysics',
-    position: pos,
-    size: {x: 128, y: 128},
-  },
-  assetId: '1',
-  speciesId: String(nextSpeciesId + i),
-  triggerId: '1',
-}));
-
 // Build grass entities
 let nextGrassId = 200;
 const grassEntities = grassPositions.map((pos, i) => ({
@@ -151,7 +57,6 @@ const grassEntities = grassPositions.map((pos, i) => ({
 export default {
   hero: '3',
   entities: [
-    ...tombstoneEntities,
     ...grassEntities,
     {
       id: '3',
@@ -190,7 +95,6 @@ export default {
     },
   ],
   species: [
-    ...tombstoneSpecies,
     {id: '2', type: 'grass', collides: false},
     {id: '3', type: 'hero', collides: true, name: 'Dude'},
   ],
