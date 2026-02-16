@@ -105,6 +105,59 @@ const CONTENT_TYPES: Record<string, string> = {
 
 const kv = await Deno.openKv();
 
+// --- Admin auth ---
+
+async function getAdminSecret(): Promise<string> {
+  const existing = await kv.get<string>(['admin', 'secret']);
+  if (existing.value) {
+    console.log(`Admin secret: ${existing.value}`);
+    return existing.value;
+  }
+  const secret = crypto.randomUUID();
+  await kv.set(['admin', 'secret'], secret);
+  console.log(`Admin secret (newly generated): ${secret}`);
+  return secret;
+}
+
+const adminSecret = await getAdminSecret();
+
+const HMAC_KEY_PARAMS = { name: 'HMAC', hash: 'SHA-256' } as const;
+const ADMIN_PAYLOAD = new TextEncoder().encode('graveyard-admin');
+
+async function getHmacKey(): Promise<CryptoKey> {
+  const keyData = new TextEncoder().encode(adminSecret);
+  return crypto.subtle.importKey('raw', keyData, HMAC_KEY_PARAMS, false, ['sign', 'verify']);
+}
+
+const hmacKey = await getHmacKey();
+
+async function signToken(): Promise<string> {
+  const sig = await crypto.subtle.sign('HMAC', hmacKey, ADMIN_PAYLOAD);
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyToken(token: string): Promise<boolean> {
+  try {
+    const bytes = new Uint8Array(token.match(/.{2}/g)!.map(h => parseInt(h, 16)));
+    return crypto.subtle.verify('HMAC', hmacKey, bytes, ADMIN_PAYLOAD);
+  } catch {
+    return false;
+  }
+}
+
+function parseCookie(request: Request, name: string): string | undefined {
+  const header = request.headers.get('cookie');
+  if (!header) return undefined;
+  const match = header.split(';').map(s => s.trim()).find(s => s.startsWith(`${name}=`));
+  return match ? match.slice(name.length + 1) : undefined;
+}
+
+async function isAdmin(request: Request): Promise<boolean> {
+  const token = parseCookie(request, 'admin_token');
+  if (!token) return false;
+  return verifyToken(token);
+}
+
 async function seed() {
   // Check if any tombstones exist
   const existing = await kv.list({ prefix: ['tombstone'] }, { limit: 1 });
@@ -159,7 +212,21 @@ async function handleChunksGet(url: URL): Promise<Response> {
   });
 }
 
+async function handleMeGet(request: Request): Promise<Response> {
+  const admin = await isAdmin(request);
+  return new Response(JSON.stringify({ role: admin ? 'admin' : 'anonymous' }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 async function handleTombstonePost(request: Request): Promise<Response> {
+  if (!(await isAdmin(request))) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const body = await request.json();
   const { position, text } = body;
 
@@ -216,8 +283,26 @@ Deno.serve({ port: 4507 }, async (request: Request) => {
   if (pathname === '/api/chunks' && request.method === 'GET') {
     return handleChunksGet(url);
   }
+  if (pathname === '/api/me' && request.method === 'GET') {
+    return handleMeGet(request);
+  }
   if (pathname === '/api/tombstone' && request.method === 'POST') {
     return handleTombstonePost(request);
+  }
+
+  // Admin login via query param
+  if (url.searchParams.has('admin')) {
+    const secret = url.searchParams.get('admin');
+    if (secret === adminSecret) {
+      const token = await signToken();
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': '/',
+          'Set-Cookie': `admin_token=${token}; HttpOnly; Path=/; SameSite=Strict`,
+        },
+      });
+    }
   }
 
   // Static files

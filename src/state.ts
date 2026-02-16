@@ -21,6 +21,7 @@ export default class State {
   // ephemeral ui data
   focus: Entity | null;
   mode: 'play' | 'edit';
+  role: 'admin' | 'anonymous' = 'anonymous';
   futurePlot: Entity;
   dialog: React.ReactNode | null = null;
 

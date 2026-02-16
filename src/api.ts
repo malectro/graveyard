@@ -17,6 +17,12 @@ export async function fetchChunks(keys: string[]): Promise<Map<string, Tombstone
   return result;
 }
 
+export async function fetchRole(): Promise<'admin' | 'anonymous'> {
+  const res = await fetch('/api/me');
+  const json = await res.json();
+  return json.role;
+}
+
 export async function placeTombstone(
   position: {x: number; y: number},
   text: string,

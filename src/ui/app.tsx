@@ -3,34 +3,36 @@ import {Button} from './button';
 import {css} from '@emotion/css';
 import styled from '@emotion/styled';
 
-export default function UiApp({game, mode, onModeChange}): React.ReactNode {
+export default function UiApp({game, mode, role, onModeChange}): React.ReactNode {
   const {dialog} = game.state;
 
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: 80,
-          flexFlow: 'column',
-          background: 'rgba(255, 255, 255, 0.1)',
-          color: 'white',
-        }}
-      >
-        <Button
-          onClick={() => {
-            onModeChange(mode === 'edit' ? 'play' : 'edit');
-          }}
+      {role === 'admin' && (
+        <div
           style={{
-            height: 30,
+            display: 'flex',
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: 80,
+            flexFlow: 'column',
+            background: 'rgba(255, 255, 255, 0.1)',
+            color: 'white',
           }}
         >
-          {mode === 'edit' ? 'Play' : 'Edit'}
-        </Button>
-      </div>
+          <Button
+            onClick={() => {
+              onModeChange(mode === 'edit' ? 'play' : 'edit');
+            }}
+            style={{
+              height: 30,
+            }}
+          >
+            {mode === 'edit' ? 'Play' : 'Edit'}
+          </Button>
+        </div>
+      )}
 
       {dialog && <DialogField game={game}>{dialog}</DialogField>}
     </div>

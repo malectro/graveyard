@@ -25,6 +25,7 @@ export function init(game): UI {
       React.createElement(UiApp, {
         game,
         mode: state.mode,
+        role: state.role,
         onModeChange: mode => game.setMode(mode),
       }),
       uiAppElement,

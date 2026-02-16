@@ -12,7 +12,7 @@ import {
 import {init as initUi} from './ui';
 import {setGame, Game} from './game';
 import {chunkKeysForBox} from './chunk-map';
-import {fetchChunks} from './api';
+import {fetchChunks, fetchRole} from './api';
 
 async function main(): Promise<void> {
   await loadShaders();
@@ -21,6 +21,7 @@ async function main(): Promise<void> {
   setGame(game);
 
   const state2 = await State.fromJSON(stateJson);
+  state2.role = await fetchRole();
   game.state = state2;
 
   const app = new PIXI.Application({

@@ -33,6 +33,7 @@ export class Game {
 
   setMode(mode: 'play' | 'edit') {
     const {state} = this;
+    if (mode === 'edit' && state.role !== 'admin') return;
     state.mode = mode;
     if (mode === 'edit') {
       // hide hero
