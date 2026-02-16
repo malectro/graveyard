@@ -3,6 +3,7 @@ export interface TombstoneRecord {
   position: {x: number; y: number};
   size: {x: number; y: number};
   text: string;
+  assetId: string;
 }
 
 export async function fetchChunks(keys: string[]): Promise<Map<string, TombstoneRecord[]>> {

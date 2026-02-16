@@ -11,8 +11,8 @@ export default function EpitaphDialog({
   return (
     <div
       className={css`
-        background: white;
-        width: 400px;
+        background: black;
+        max-width: 400px;
         padding: 10px;
       `}
     >

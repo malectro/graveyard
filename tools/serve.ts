@@ -80,6 +80,13 @@ interface TombstoneRecord {
   position: { x: number; y: number };
   size: { x: number; y: number };
   text: string;
+  assetId: string;
+}
+
+const TOMBSTONE_ASSET_IDS = ['1', '10', '11', '12', '13', '14', '15'];
+
+function randomAssetId(): string {
+  return TOMBSTONE_ASSET_IDS[Math.floor(Math.random() * TOMBSTONE_ASSET_IDS.length)];
 }
 
 // --- Content types ---
@@ -102,6 +109,17 @@ const CONTENT_TYPES: Record<string, string> = {
 };
 
 // --- Main ---
+
+if (Deno.args.includes('--reset-kv')) {
+  const kv = await Deno.openKv();
+  let count = 0;
+  for await (const entry of kv.list({ prefix: [] })) {
+    await kv.delete(entry.key);
+    count++;
+  }
+  kv.close();
+  console.log(`Deleted ${count} KV entries. Restarting fresh.`);
+}
 
 const kv = await Deno.openKv();
 
@@ -172,6 +190,7 @@ async function seed() {
       position: pos,
       size: { x: 128, y: 128 },
       text: epitaphs[i],
+      assetId: randomAssetId(),
     };
     const cx = toChunkCoord(pos.x);
     const cy = toChunkCoord(pos.y);
@@ -243,6 +262,7 @@ async function handleTombstonePost(request: Request): Promise<Response> {
     position: { x: position.x, y: position.y },
     size: { x: 128, y: 128 },
     text,
+    assetId: randomAssetId(),
   };
 
   const cx = toChunkCoord(position.x);
