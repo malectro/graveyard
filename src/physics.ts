@@ -3,6 +3,7 @@ import {PhysicsBox, Box, doBoxesIntersect} from './utils/box';
 import {Entity} from './entity';
 import Component from './component';
 import State from './state';
+import {isNearPath, MIN_TOMBSTONE_SPACING} from './paths';
 
 export interface Physics extends Component, Box {}
 
@@ -136,7 +137,7 @@ export class OverlayPhysics implements Physics {
 
   tick(state: State, now: number, _delta: number): void {
     if (this.entity.graphic.mesh instanceof PIXI.Sprite) {
-      if (this.isColliding(state) || !state.isInsideCluster(this.position)) {
+      if (this.cannotPlace(state)) {
         this.entity.graphic.mesh.tint = 0xff0000;
       } else {
         this.entity.graphic.mesh.tint = 0xffffff;
@@ -144,14 +145,19 @@ export class OverlayPhysics implements Physics {
     }
   }
 
-  isColliding(state: State): boolean {
-    let collides = false;
+  cannotPlace(state: State): boolean {
+    if (isNearPath(this.position.x, this.position.y)) {
+      return true;
+    }
     for (const entity of state.entities.entitiesNear(this.position)) {
-      if (entity.box !== this && entity.species.collides && doBoxesIntersect(this, entity.box)) {
-        collides = true;
+      if (entity.box !== this && entity.species.collides) {
+        const dx = this.position.x - entity.box.position.x;
+        const dy = this.position.y - entity.box.position.y;
+        if (Math.sqrt(dx * dx + dy * dy) < MIN_TOMBSTONE_SPACING) {
+          return true;
+        }
       }
     }
-
-    return collides;
+    return false;
   }
 }

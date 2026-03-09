@@ -8,7 +8,8 @@ import {IdMap} from './utils/id-map';
 import {ChunkMap} from './chunk-map';
 import {newId} from './utils/id';
 import * as p from './utils/point';
-import {TombstoneRecord, ClusterRecord, placeTombstone, fetchClusters} from './api';
+import {TombstoneRecord, placeTombstone} from './api';
+import {isNearPath} from './paths';
 
 export default class State {
   // persistent data
@@ -17,9 +18,6 @@ export default class State {
   assets: IdMap<Asset>;
   species: IdMap<Species>;
   triggers: IdMap<Trigger>;
-
-  // cluster data
-  clusters: ClusterRecord[] = [];
 
   // ephemeral ui data
   focus: Entity | null;
@@ -95,23 +93,15 @@ export default class State {
     return entity;
   }
 
-  isInsideCluster(position: {x: number; y: number}): boolean {
-    return this.clusters.some(c => {
-      const dx = position.x - c.center.x;
-      const dy = position.y - c.center.y;
-      return Math.sqrt(dx * dx + dy * dy) <= c.radius;
-    });
-  }
-
   placePlot(text: string): Entity | undefined {
     const {box} = this.futurePlot;
-    if (box instanceof OverlayPhysics && box.isColliding(this)) {
+    if (box instanceof OverlayPhysics && box.cannotPlace(this)) {
       return;
     }
 
     const position = {x: box.position.x, y: box.position.y};
 
-    if (!this.isInsideCluster(position)) {
+    if (isNearPath(position.x, position.y)) {
       return;
     }
 
@@ -128,10 +118,6 @@ export default class State {
       this.entities.delete(tempId);
       const serverEntity = this.createTombstoneEntity(serverRecord);
       this.entities.set(serverEntity.id, serverEntity);
-      // Re-fetch clusters to pick up any auto-generated ones
-      return fetchClusters();
-    }).then(updatedClusters => {
-      this.clusters = updatedClusters;
     }).catch(err => {
       console.error('Failed to persist tombstone:', err);
       this.entities.delete(tempId);

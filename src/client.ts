@@ -13,7 +13,7 @@ import {init as initUi} from './ui';
 import {setGame, Game} from './game';
 import {Terrain} from './terrain';
 import {chunkKeysForBox} from './chunk-map';
-import {fetchChunks, fetchClusters, fetchRole} from './api';
+import {fetchChunks, fetchRole} from './api';
 
 async function main(): Promise<void> {
   await loadShaders();
@@ -23,7 +23,6 @@ async function main(): Promise<void> {
 
   const state2 = await State.fromJSON(stateJson);
   state2.role = await fetchRole();
-  state2.clusters = await fetchClusters();
   game.state = state2;
 
   const app = new PIXI.Application({
@@ -37,7 +36,7 @@ async function main(): Promise<void> {
 
   const view = new View(app, {cameraPaddingPercentage: 0.2});
 
-  const terrain = new Terrain(app.screen.width, app.screen.height, state2.clusters);
+  const terrain = new Terrain(app.screen.width, app.screen.height);
   const world = new PIXI.Container();
   game.world = world;
   game.view = view;
@@ -46,7 +45,7 @@ async function main(): Promise<void> {
   const {hero} = state2;
   state2.focus = hero;
   app.stage.addChild(terrain.grass);
-  app.stage.addChild(terrain.dirt);
+  app.stage.addChild(terrain.paths);
   app.stage.addChild(world);
   app.stage.addChild(hero.graphic.mesh);
 
@@ -122,7 +121,6 @@ async function main(): Promise<void> {
     }
 
     terrain.update(view.camera.position.x, view.camera.position.y);
-    terrain.updateClusters(state2.clusters);
   });
 
   const globalInput = new GlobalInput();

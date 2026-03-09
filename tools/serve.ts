@@ -2,12 +2,39 @@ import { resolve, extname } from 'https://deno.land/std/path/mod.ts';
 import { buildDir } from './common.ts';
 
 const CHUNK_SIZE = 512;
-const MIN_CLUSTER_GAP = 200;
-const MIN_TOMBSTONE_SPACING = 96;
-const CLUSTER_RADIUS_MIN = 300;
-const CLUSTER_RADIUS_MAX = 500;
-const CLUSTER_CAPACITY_THRESHOLD = 0.8;
-const NEARBY_CLUSTER_RANGE = 2000;
+const MIN_TOMBSTONE_SPACING = 200;
+
+// Path system — must match client-side src/paths.ts exactly
+const GRID_SPACING = 600;
+const PATH_HALF_WIDTH = 28;
+const PATH_MARGIN = 40;
+
+function pathHash(n: number): number {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function pathWobble(lineIndex: number, axisOffset: number, along: number): number {
+  const seed = lineIndex * 73 + axisOffset;
+  const amp = 12 + pathHash(seed) * 24;
+  const freq = 0.003 + pathHash(seed + 1) * 0.003;
+  const phase = pathHash(seed + 2) * Math.PI * 2;
+  return Math.sin(along * freq + phase) * amp;
+}
+
+function distToNearestPath(x: number, y: number): number {
+  const vIdx = Math.round(x / GRID_SPACING);
+  const vCenterX = vIdx * GRID_SPACING + pathWobble(vIdx, 0, y);
+  const vDist = Math.abs(x - vCenterX);
+  const hIdx = Math.round(y / GRID_SPACING);
+  const hCenterY = hIdx * GRID_SPACING + pathWobble(hIdx, 1000, x);
+  const hDist = Math.abs(y - hCenterY);
+  return Math.min(vDist, hDist);
+}
+
+function isNearPath(x: number, y: number): boolean {
+  return distToNearestPath(x, y) <= PATH_HALF_WIDTH + PATH_MARGIN;
+}
 
 function toChunkCoord(worldPos: number): number {
   return Math.floor(worldPos / CHUNK_SIZE);
@@ -56,100 +83,16 @@ interface TombstoneRecord {
   assetId: string;
 }
 
-interface ClusterRecord {
-  id: string;
-  center: { x: number; y: number };
-  radius: number;
-  tombstoneCount: number;
-  maxTombstones: number;
-}
-
 const TOMBSTONE_ASSET_IDS = ['1', '10', '11', '12', '13', '14', '15'];
 
 function randomAssetId(): string {
   return TOMBSTONE_ASSET_IDS[Math.floor(Math.random() * TOMBSTONE_ASSET_IDS.length)];
 }
 
-// --- Cluster system ---
-
-let clusters: ClusterRecord[] = [];
-
-function clusterMaxTombstones(radius: number): number {
-  return Math.floor(Math.PI * radius * radius / (200 * 200));
-}
-
 function distanceBetween(a: { x: number; y: number }, b: { x: number; y: number }): number {
   const dx = a.x - b.x;
   const dy = a.y - b.y;
   return Math.sqrt(dx * dx + dy * dy);
-}
-
-function clustersOverlap(a: ClusterRecord, bCenter: { x: number; y: number }, bRadius: number): boolean {
-  const edgeDistance = distanceBetween(a.center, bCenter) - a.radius - bRadius;
-  return edgeDistance < MIN_CLUSTER_GAP;
-}
-
-function findClusterContaining(pos: { x: number; y: number }): ClusterRecord | undefined {
-  return clusters.find(c => distanceBetween(c.center, pos) <= c.radius);
-}
-
-function randomPointInCluster(cluster: ClusterRecord, margin = 64): { x: number; y: number } {
-  const maxR = cluster.radius - margin;
-  if (maxR <= 0) return { ...cluster.center };
-  const angle = Math.random() * 2 * Math.PI;
-  const r = Math.sqrt(Math.random()) * maxR; // sqrt for uniform distribution
-  return {
-    x: cluster.center.x + Math.cos(angle) * r,
-    y: cluster.center.y + Math.sin(angle) * r,
-  };
-}
-
-function createClusterRecord(center: { x: number; y: number }, radius: number): ClusterRecord {
-  return {
-    id: `cluster_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-    center,
-    radius,
-    tombstoneCount: 0,
-    maxTombstones: clusterMaxTombstones(radius),
-  };
-}
-
-function generateNewCluster(): ClusterRecord | null {
-  if (clusters.length === 0) return null;
-
-  for (let attempt = 0; attempt < 20; attempt++) {
-    const anchor = clusters[Math.floor(Math.random() * clusters.length)];
-    const newRadius = CLUSTER_RADIUS_MIN + Math.random() * (CLUSTER_RADIUS_MAX - CLUSTER_RADIUS_MIN);
-    const minDist = anchor.radius + newRadius + MIN_CLUSTER_GAP;
-    const maxDist = minDist + 300;
-    const dist = minDist + Math.random() * (maxDist - minDist);
-    const angle = Math.random() * 2 * Math.PI;
-
-    const newCenter = {
-      x: anchor.center.x + Math.cos(angle) * dist,
-      y: anchor.center.y + Math.sin(angle) * dist,
-    };
-
-    const overlaps = clusters.some(c => clustersOverlap(c, newCenter, newRadius));
-    if (!overlaps) {
-      return createClusterRecord(newCenter, newRadius);
-    }
-  }
-
-  return null;
-}
-
-async function persistCluster(cluster: ClusterRecord): Promise<void> {
-  await kv.set(['cluster', cluster.id], cluster);
-}
-
-async function loadClusters(): Promise<void> {
-  clusters = [];
-  const entries = kv.list<ClusterRecord>({ prefix: ['cluster'] });
-  for await (const entry of entries) {
-    clusters.push(entry.value);
-  }
-  console.log(`Loaded ${clusters.length} clusters from KV.`);
 }
 
 async function getNearbyTombstones(pos: { x: number; y: number }): Promise<TombstoneRecord[]> {
@@ -167,25 +110,6 @@ async function getNearbyTombstones(pos: { x: number; y: number }): Promise<Tombs
   }
 
   return records;
-}
-
-async function maybeAutoGenerateCluster(cluster: ClusterRecord): Promise<void> {
-  if (cluster.tombstoneCount < cluster.maxTombstones * CLUSTER_CAPACITY_THRESHOLD) return;
-
-  // Check if any nearby cluster has room
-  const hasNearbyRoom = clusters.some(c =>
-    c.id !== cluster.id &&
-    distanceBetween(c.center, cluster.center) < NEARBY_CLUSTER_RANGE &&
-    c.tombstoneCount < c.maxTombstones
-  );
-  if (hasNearbyRoom) return;
-
-  const newCluster = generateNewCluster();
-  if (newCluster) {
-    clusters.push(newCluster);
-    await persistCluster(newCluster);
-    console.log(`Auto-generated cluster ${newCluster.id} at (${Math.round(newCluster.center.x)}, ${Math.round(newCluster.center.y)}) radius=${Math.round(newCluster.radius)}`);
-  }
 }
 
 // --- Content types ---
@@ -276,63 +200,43 @@ async function isAdmin(request: Request): Promise<boolean> {
 }
 
 async function seed() {
-  // Check if any clusters exist — if so, already seeded
-  const existingClusters = await kv.list({ prefix: ['cluster'] }, { limit: 1 });
-  const firstCluster = await existingClusters.next();
-  if (!firstCluster.done) return; // already seeded
+  // Check if any tombstones exist — if so, already seeded
+  const existing = await kv.list({ prefix: ['tombstone'] }, { limit: 1 });
+  const first = await existing.next();
+  if (!first.done) return; // already seeded
 
-  console.log('Seeding KV with initial clusters and tombstones...');
+  console.log('Seeding KV with initial tombstones...');
 
-  // Create initial clusters near origin
-  const seedClusters = [
-    createClusterRecord({ x: 0, y: 0 }, 400),
-    createClusterRecord({ x: -700, y: -500 }, 350),
-    createClusterRecord({ x: 600, y: -400 }, 380),
-    createClusterRecord({ x: -200, y: 700 }, 320),
-  ];
+  const placed: TombstoneRecord[] = [];
+  for (const epitaph of epitaphs) {
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const x = Math.round((Math.random() - 0.5) * 2000);
+      const y = Math.round((Math.random() - 0.5) * 2000);
 
-  // Override IDs for stable seeding
-  seedClusters[0].id = 'seed_cluster_0';
-  seedClusters[1].id = 'seed_cluster_1';
-  seedClusters[2].id = 'seed_cluster_2';
-  seedClusters[3].id = 'seed_cluster_3';
+      if (isNearPath(x, y)) continue;
 
-  for (const cluster of seedClusters) {
-    await persistCluster(cluster);
-  }
+      const tooClose = placed.some(t => distanceBetween({ x, y }, t.position) < MIN_TOMBSTONE_SPACING);
+      if (tooClose) continue;
 
-  // Distribute tombstones across clusters
-  let tombstoneIndex = 0;
-  for (const cluster of seedClusters) {
-    // Each cluster gets roughly equal share
-    const count = Math.ceil(epitaphs.length / seedClusters.length);
-    for (let i = 0; i < count && tombstoneIndex < epitaphs.length; i++, tombstoneIndex++) {
-      const pos = randomPointInCluster(cluster);
       const record: TombstoneRecord = {
-        id: `seed_${tombstoneIndex}`,
-        position: { x: Math.round(pos.x), y: Math.round(pos.y) },
+        id: `seed_${placed.length}`,
+        position: { x, y },
         size: { x: 128, y: 128 },
-        text: epitaphs[tombstoneIndex],
+        text: epitaph,
         assetId: randomAssetId(),
       };
-      const cx = toChunkCoord(record.position.x);
-      const cy = toChunkCoord(record.position.y);
+      const cx = toChunkCoord(x);
+      const cy = toChunkCoord(y);
       await kv.set(['tombstone', cx, cy, record.id], record);
-      cluster.tombstoneCount++;
+      placed.push(record);
+      break;
     }
-    // Persist updated count
-    await persistCluster(cluster);
   }
 
-  console.log(`Seeded ${seedClusters.length} clusters and ${tombstoneIndex} tombstones.`);
+  console.log(`Seeded ${placed.length} tombstones.`);
 }
 
 await seed();
-await loadClusters();
-
-for (const c of clusters) {
-  console.log(`  Cluster ${c.id}: center=(${Math.round(c.center.x)}, ${Math.round(c.center.y)}) radius=${Math.round(c.radius)} tombstones=${c.tombstoneCount}/${c.maxTombstones}`);
-}
 
 async function handleChunksGet(url: URL): Promise<Response> {
   const keysParam = url.searchParams.get('keys');
@@ -364,12 +268,6 @@ async function handleChunksGet(url: URL): Promise<Response> {
   });
 }
 
-function handleClustersGet(): Response {
-  return new Response(JSON.stringify(clusters), {
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
-
 async function handleMeGet(request: Request): Promise<Response> {
   const admin = await isAdmin(request);
   return new Response(JSON.stringify({ role: admin ? 'admin' : 'anonymous' }), {
@@ -395,18 +293,9 @@ async function handleTombstonePost(request: Request): Promise<Response> {
     });
   }
 
-  // Check position is within a cluster
-  const cluster = findClusterContaining(position);
-  if (!cluster) {
-    return new Response(JSON.stringify({ error: 'Position is not within any cluster' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  // Check cluster capacity
-  if (cluster.tombstoneCount >= cluster.maxTombstones) {
-    return new Response(JSON.stringify({ error: 'Cluster is full' }), {
+  // Check position is not on or near a path
+  if (isNearPath(position.x, position.y)) {
+    return new Response(JSON.stringify({ error: 'Cannot place on a path' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -436,13 +325,6 @@ async function handleTombstonePost(request: Request): Promise<Response> {
   const cx = toChunkCoord(position.x);
   const cy = toChunkCoord(position.y);
   await kv.set(['tombstone', cx, cy, id], record);
-
-  // Update cluster count
-  cluster.tombstoneCount++;
-  await persistCluster(cluster);
-
-  // Auto-generate new cluster if needed
-  await maybeAutoGenerateCluster(cluster);
 
   return new Response(JSON.stringify(record), {
     status: 201,
@@ -477,9 +359,6 @@ Deno.serve({ port: 4507 }, async (request: Request) => {
   // API routes
   if (pathname === '/api/chunks' && request.method === 'GET') {
     return handleChunksGet(url);
-  }
-  if (pathname === '/api/clusters' && request.method === 'GET') {
-    return handleClustersGet();
   }
   if (pathname === '/api/me' && request.method === 'GET') {
     return handleMeGet(request);

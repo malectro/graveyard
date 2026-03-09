@@ -6,14 +6,6 @@ export interface TombstoneRecord {
   assetId: string;
 }
 
-export interface ClusterRecord {
-  id: string;
-  center: {x: number; y: number};
-  radius: number;
-  tombstoneCount: number;
-  maxTombstones: number;
-}
-
 export async function fetchChunks(keys: string[]): Promise<Map<string, TombstoneRecord[]>> {
   const param = keys.join(';');
   const response = await fetch(`/api/chunks?keys=${encodeURIComponent(param)}`);
@@ -24,11 +16,6 @@ export async function fetchChunks(keys: string[]): Promise<Map<string, Tombstone
     result.set(key, records as TombstoneRecord[]);
   }
   return result;
-}
-
-export async function fetchClusters(): Promise<ClusterRecord[]> {
-  const response = await fetch('/api/clusters');
-  return response.json();
 }
 
 export async function fetchRole(): Promise<'admin' | 'anonymous'> {

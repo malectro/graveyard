@@ -1,8 +1,10 @@
 import * as PIXI from 'pixi.js';
-import {ClusterRecord} from './api';
+import {GRID_SPACING, PATH_HALF_WIDTH, pathWobble} from './paths';
 
 const TILE_SIZE = 32;
 const TILE_PADDING = TILE_SIZE;
+const PATH_REDRAW_THRESHOLD = 100;
+const PATH_SAMPLE_STEP = 16;
 
 function generateGrassTexture(): PIXI.Texture {
   const canvas = document.createElement('canvas');
@@ -34,12 +36,13 @@ function generateGrassTexture(): PIXI.Texture {
 
 export class Terrain {
   grass: PIXI.TilingSprite;
-  dirt: PIXI.Graphics;
+  paths: PIXI.Graphics;
   private screenWidth: number;
   private screenHeight: number;
-  private clusterCount: number;
+  private lastPathCameraX = Infinity;
+  private lastPathCameraY = Infinity;
 
-  constructor(screenWidth: number, screenHeight: number, clusters: ClusterRecord[]) {
+  constructor(screenWidth: number, screenHeight: number) {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
 
@@ -51,10 +54,8 @@ export class Terrain {
       screenHeight + TILE_PADDING * 2,
     );
 
-    // Dirt circles layer
-    this.dirt = new PIXI.Graphics();
-    this.clusterCount = 0;
-    this.drawClusters(clusters);
+    // Path overlay layer
+    this.paths = new PIXI.Graphics();
   }
 
   update(cameraX: number, cameraY: number): void {
@@ -66,26 +67,70 @@ export class Terrain {
     // Keep tiles world-aligned
     this.grass.tilePosition.x = -this.grass.x;
     this.grass.tilePosition.y = -this.grass.y;
-  }
 
-  updateClusters(clusters: ClusterRecord[]): void {
-    if (clusters.length !== this.clusterCount) {
-      this.drawClusters(clusters);
+    // Redraw paths if camera moved enough
+    const dx = cameraX - this.lastPathCameraX;
+    const dy = cameraY - this.lastPathCameraY;
+    if (dx * dx + dy * dy > PATH_REDRAW_THRESHOLD * PATH_REDRAW_THRESHOLD) {
+      this.drawPaths(cameraX, cameraY);
+      this.lastPathCameraX = cameraX;
+      this.lastPathCameraY = cameraY;
     }
   }
 
-  private drawClusters(clusters: ClusterRecord[]): void {
-    this.clusterCount = clusters.length;
-    this.dirt.clear();
-    for (const cluster of clusters) {
-      // Filled circle
-      this.dirt.beginFill(0x5c3d1e);
-      this.dirt.drawCircle(cluster.center.x, cluster.center.y, cluster.radius);
-      this.dirt.endFill();
-      // Border ring
-      this.dirt.lineStyle(4, 0x4a2e14);
-      this.dirt.drawCircle(cluster.center.x, cluster.center.y, cluster.radius);
-      this.dirt.lineStyle(0);
+  private drawPaths(cameraX: number, cameraY: number): void {
+    const pad = 100;
+    const halfW = this.screenWidth / 2 + pad;
+    const halfH = this.screenHeight / 2 + pad;
+    const left = cameraX - halfW;
+    const right = cameraX + halfW;
+    const top = cameraY - halfH;
+    const bottom = cameraY + halfH;
+
+    this.paths.clear();
+
+    const pathWidth = PATH_HALF_WIDTH * 2;
+
+    // Border layer (slightly wider, darker)
+    this.paths.lineStyle(pathWidth + 6, 0x3d3228);
+    this.drawPathLines(left, right, top, bottom);
+
+    // Main path surface
+    this.paths.lineStyle(pathWidth, 0x7a6b5a);
+    this.drawPathLines(left, right, top, bottom);
+  }
+
+  private drawPathLines(left: number, right: number, top: number, bottom: number): void {
+    // Vertical paths
+    const vStart = Math.floor(left / GRID_SPACING);
+    const vEnd = Math.ceil(right / GRID_SPACING);
+    for (let i = vStart; i <= vEnd; i++) {
+      let first = true;
+      for (let y = top; y <= bottom; y += PATH_SAMPLE_STEP) {
+        const x = i * GRID_SPACING + pathWobble(i, 0, y);
+        if (first) {
+          this.paths.moveTo(x, y);
+          first = false;
+        } else {
+          this.paths.lineTo(x, y);
+        }
+      }
+    }
+
+    // Horizontal paths
+    const hStart = Math.floor(top / GRID_SPACING);
+    const hEnd = Math.ceil(bottom / GRID_SPACING);
+    for (let i = hStart; i <= hEnd; i++) {
+      let first = true;
+      for (let x = left; x <= right; x += PATH_SAMPLE_STEP) {
+        const y = i * GRID_SPACING + pathWobble(i, 1000, x);
+        if (first) {
+          this.paths.moveTo(x, y);
+          first = false;
+        } else {
+          this.paths.lineTo(x, y);
+        }
+      }
     }
   }
 }
