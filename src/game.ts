@@ -11,6 +11,7 @@ import {
   adaptBrowserController,
 } from './controls';
 import View from './view';
+import {Terrain} from './terrain';
 import EpitaphDialog from './ui/EpitaphDialog';
 
 let _game;
@@ -28,6 +29,7 @@ export class Game {
   world: PIXI.Container;
   state: State;
   view: View;
+  terrain: Terrain;
   globalInput: GlobalInput;
   ui: UI;
 
