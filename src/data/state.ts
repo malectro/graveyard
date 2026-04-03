@@ -122,6 +122,13 @@ export default {
       src: 'tombstone-broken.png',
     },
     {
+      id: '16',
+      className: 'StaticGraphic',
+      sourceSize: {width: 32, height: 32},
+      size: {width: 128, height: 128},
+      src: 'hld-tombstone.png',
+    },
+    {
       id: '2',
       className: 'StaticGraphic',
       sourceSize: {width: 16, height: 16},

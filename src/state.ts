@@ -69,7 +69,7 @@ export default class State {
   }
 
   createTombstoneEntity(record: TombstoneRecord): Entity {
-    const asset = this.assets.get(record.assetId || '1');
+    const asset = this.assets.get(record.assetId || '16');
     const graphic = StaticGraphic.fromJSON(asset);
     const species = this.createSpecies({
       type: 'headstone',

@@ -83,7 +83,7 @@ interface TombstoneRecord {
   assetId: string;
 }
 
-const TOMBSTONE_ASSET_IDS = ['1', '10', '11', '12', '13', '14', '15'];
+const TOMBSTONE_ASSET_IDS = ['16'];
 
 function randomAssetId(): string {
   return TOMBSTONE_ASSET_IDS[Math.floor(Math.random() * TOMBSTONE_ASSET_IDS.length)];

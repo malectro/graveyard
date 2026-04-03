@@ -54,7 +54,7 @@ export class Game {
           {x: 128, y: 128},
         ),
         // TODO (kyle): using headstone graphic here
-        StaticGraphic.fromJSON(state.assets.get('1')),
+        StaticGraphic.fromJSON(state.assets.get('16')),
         // TODO (kyle): don't use grass for this?
         state.species.get('2'),
       );
